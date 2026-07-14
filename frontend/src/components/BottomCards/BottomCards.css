@@ -1,0 +1,83 @@
+.premium-bottom-dashboard-grid {
+  grid-column: 1 / span 2;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  width: 100%;
+}
+
+.dashboard-widget-card-node {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 20px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: slideCardUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.dashboard-widget-card-node:nth-child(1) { animation-delay: 0.1s; }
+.dashboard-widget-card-node:nth-child(2) { animation-delay: 0.2s; }
+.dashboard-widget-card-node:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes slideCardUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.dashboard-widget-card-node:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.06);
+  border-color: #cbd5e1;
+}
+
+.dashboard-widget-card-node h4 {
+  font-size: 13px;
+  font-weight: 700;
+  color: #475569;
+  margin-bottom: 14px;
+}
+
+.card-header-flex { display: flex; justify-content: space-between; align-items: center; }
+.live-badge-pulse { font-size: 11px; color: #22c55e; font-weight: 700; animation: blink 1.5s infinite; }
+
+@keyframes blink { 50% { opacity: 0.5; } }
+
+.mock-sparkline-graph {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  height: 50px;
+  margin-top: 10px;
+}
+
+.spark-bar {
+  flex: 1;
+  background: #cbd5e1;
+  border-radius: 4px;
+  transition: background 0.3s;
+}
+.spark-bar.red-spark { background: #ef4444; }
+
+.poi-chips-scroller { display: flex; gap: 8px; flex-wrap: wrap; }
+.poi-chip-interactive {
+  background: #f1f5f9;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.poi-chip-interactive:hover {
+  background: #1a73e8;
+  color: white;
+}
+
+.weather-split-data { display: flex; align-items: center; gap: 16px; }
+.weather-temp-num { font-size: 32px; font-weight: 700; color: #f59e0b; }
+.weather-location-text strong { display: block; font-size: 14px; color: #1e293b; }
+.weather-location-text p { font-size: 12px; color: #64748b; }

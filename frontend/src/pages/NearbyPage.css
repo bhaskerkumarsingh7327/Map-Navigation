@@ -1,0 +1,16 @@
+/* src/pages/Nearby/NearbyPage.css */
+.pill-scroll-track { display: flex; gap: 12px; flex-wrap: wrap; }
+.enterprise-filter-pill-node { background: #f2f2f7; border: none; padding: 10px 20px; border-radius: 20px; font-size: 13px; font-weight: 600; color: #636366; cursor: pointer; transition: all 0.25s; }
+.enterprise-filter-pill-node:hover { background: #e5e5ea; }
+.enterprise-filter-pill-node.pill-is-selected { background: #007aff; color: #ffffff; }
+
+.poi-cards-layout-matrix { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+.poi-native-card-cell { background: #f2f2f7; border-radius: 18px; padding: 20px; display: flex; flex-direction: column; gap: 14px; transition: all 0.2s; }
+.poi-native-card-cell:hover { background: #ffffff; border: 1px solid #e5e5ea; box-shadow: 0 10px 20px rgba(0,0,0,0.02); }
+
+.poi-cell-top-flex { display: flex; justify-content: space-between; align-items: center; }
+.poi-cell-top-flex h4 { font-size: 16px; font-weight: 700; color: #1c1c1e; }
+.poi-active-status-tag { font-size: 11px; font-weight: 700; background: #ffffff; padding: 4px 10px; border-radius: 8px; color: #30d158; border: 1px solid #e5e5ea; }
+
+.poi-cell-bottom-flex { display: flex; justify-content: space-between; font-size: 13px; align-items: center; }
+.poi-type-label-text { color: #8e8e93; font-weight: 600; }

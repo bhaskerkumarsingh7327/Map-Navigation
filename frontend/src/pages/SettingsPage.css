@@ -1,0 +1,20 @@
+/* src/pages/Settings/SettingsPage.css */
+.settings-card-group-wrapper {
+  background: #f2f2f7;
+  border-radius: 20px;
+  padding: 28px;
+  max-width: 650px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.settings-card-group-wrapper h3 { font-size: 12px; font-weight: 700; color: #636366; text-transform: uppercase; border-bottom: 1px solid #e5e5ea; padding-bottom: 8px; }
+.switch-flex-row-item { display: flex; justify-content: space-between; align-items: center; }
+.switch-flex-row-item strong { font-size: 15px; font-weight: 600; color: #1c1c1e; }
+.switch-flex-row-item p { font-size: 13px; color: #8e8e93; margin-top: 2px; }
+
+.switch-toggle-track { width: 50px; height: 28px; background: #d1d1d6; border-radius: 20px; position: relative; cursor: pointer; transition: background 0.25s ease; flex-shrink: 0; }
+.switch-toggle-track.track-is-on { background: #30d158; }
+.switch-toggle-thumb-node { width: 24px; height: 24px; background: white; border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: transform 0.25s cubic-bezier(0.25, 0.8, 0.25, 1); }
+.switch-toggle-track.track-is-on .switch-toggle-thumb-node { transform: translateX(22px); }

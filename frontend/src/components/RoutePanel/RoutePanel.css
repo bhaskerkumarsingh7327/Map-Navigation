@@ -1,0 +1,283 @@
+/* .route-card{
+
+    position:absolute;
+
+    top:20px;
+
+    right:20px;
+
+    width:340px;
+
+    background:rgba(255,255,255,.95);
+
+    backdrop-filter:blur(18px);
+
+    border-radius:24px;
+
+    padding:24px;
+
+    box-shadow:0 20px 45px rgba(0,0,0,.12);
+
+    z-index:1000;
+
+}
+
+.route-card h2{
+
+    color:#2563eb;
+
+    margin-bottom:22px;
+
+}
+
+.route-stats{
+
+    display:flex;
+
+    gap:15px;
+
+    margin-bottom:20px;
+
+}
+
+.stat{
+
+    flex:1;
+
+    background:#f8fafc;
+
+    border-radius:16px;
+
+    padding:16px;
+
+    display:flex;
+
+    gap:12px;
+
+    align-items:center;
+
+}
+
+.stat svg{
+
+    font-size:22px;
+
+    color:#2563eb;
+
+}
+
+.stat span{
+
+    color:#64748b;
+
+    font-size:13px;
+
+}
+
+.route-type{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:12px;
+
+    margin-bottom:20px;
+
+}
+
+.option{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    padding:15px;
+
+    border-radius:16px;
+
+    background:#f8fafc;
+
+    cursor:pointer;
+
+}
+
+.option.active{
+
+    background:#2563eb;
+
+    color:white;
+
+}
+
+.info-box{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    margin-bottom:22px;
+
+}
+
+.info-box div{
+
+    text-align:center;
+
+}
+
+.info-box svg{
+
+    color:#2563eb;
+
+    margin-bottom:8px;
+
+}
+
+.navigate-btn{
+
+    width:100%;
+
+    height:52px;
+
+    border:none;
+
+    border-radius:16px;
+
+    background:#2563eb;
+
+    color:white;
+
+    font-size:16px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+} */
+/* src/components/RoutePanel/RoutePanel.css */
+.premium-analytics-sidebar-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 24px;
+  height: 100%;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+  animation: fadeInRight 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeInRight {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.panel-header-section h3 {
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 20px;
+}
+
+.metrics-grid-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.metric-row-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+}
+
+.lbl-node { color: #64748b; font-weight: 500; }
+.val-node { font-weight: 600; color: #1e293b; }
+.val-node-highlight { font-weight: 700; color: #0f172a; }
+
+.status-warning-pill {
+  background: #fff7ed;
+  color: #ea580c;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.divider-soft {
+  border: 0;
+  border-top: 1px solid #f1f5f9;
+  margin: 20px 0;
+}
+
+.premium-analytics-sidebar-card h4 {
+  font-size: 12px;
+  font-weight: 700;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+}
+
+.progress-gradient-track {
+  display: flex;
+  height: 6px;
+  background: #f1f5f9;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+.fill-chunk { height: 100%; }
+.fill-red { background: #ef4444; }
+.fill-blue { background: #3b82f6; }
+
+.comparison-flex-box {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.comp-block {
+  background: #f8fafc;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.comp-block.active-comp {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
+.comp-title { font-size: 11px; font-weight: 600; color: #64748b; }
+.comp-meta { font-size: 13px; font-weight: 700; color: #1e293b; }
+.text-green { color: #16a34a; }
+
+.alt-route-list-node {
+  display: flex;
+  justify-content: space-between;
+  padding: 14px;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  margin-bottom: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.alt-route-list-node:hover {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03);
+}
+
+.alt-route-title { font-weight: 600; color: #334155; }
+.alt-route-time { font-weight: 700; color: #0f172a; }

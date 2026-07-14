@@ -1,0 +1,42 @@
+/* src/pages/History/HistoryPage.css */
+.table-viewport-frame {
+  border: 1px solid rgba(0,0,0,0.05);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.enterprise-data-grid {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 14px;
+}
+
+.enterprise-data-grid th {
+  background: #f2f2f7;
+  padding: 16px 24px;
+  color: #636366;
+  font-weight: 700;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.enterprise-data-grid td {
+  padding: 18px 24px;
+  border-bottom: 1px solid #f2f2f7;
+  color: #1c1c1e;
+}
+
+.data-row-item-interactive {
+  transition: background 0.2s ease;
+}
+
+.data-row-item-interactive:hover {
+  background: #f2f2f7;
+}
+
+.id-code-token { background: #e5e5ea; padding: 4px 8px; border-radius: 6px; font-size: 12px; }
+.node-text-weight { font-weight: 600; }
+.algo-instance-pill { background: #e5f1ff; color: #007aff; padding: 4px 10px; border-radius: 8px; font-weight: 700; font-size: 12px; }
+.cost-metric-txt { font-weight: 700; color: #1c1c1e; }

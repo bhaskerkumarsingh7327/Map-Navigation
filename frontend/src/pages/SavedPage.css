@@ -1,0 +1,46 @@
+/* src/pages/Saved/SavedPage.css */
+.bookmarks-responsive-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.bookmark-premium-box {
+  background: #f2f2f7;
+  border-radius: 20px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bookmark-premium-box:hover {
+  background: #ffffff;
+  transform: translateY(-4px);
+  box-shadow: 0 16px 32px rgba(0,0,0,0.04);
+  border: 1px solid #e5e5ea;
+}
+
+.bookmark-top-header { display: flex; align-items: center; gap: 10px; }
+.pulse-indicator-dot { width: 8px; height: 8px; background: #007aff; border-radius: 50%; box-shadow: 0 0 8px rgba(0,122,255,0.4); }
+.bookmark-top-header h3 { font-size: 15px; font-weight: 700; color: #1c1c1e; }
+
+.bookmark-content-card { background: #ffffff; padding: 14px; border-radius: 12px; font-size: 13px; }
+.bookmark-content-card p span { color: #8e8e93; font-weight: 600; }
+.dashed-connector-bar { height: 12px; border-left: 2px dashed #c7c7cc; margin: 6px 4px; }
+
+.bookmark-footer-row { display: flex; justify-content: space-between; align-items: center; }
+.preference-badge-pill { font-size: 11px; font-weight: 700; background: #ffffff; color: #007aff; padding: 4px 10px; border-radius: 20px; border: 1px solid #e5e5ea; }
+
+.btn-deploy-vector-action {
+  width: 100%;
+  background: #007aff;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+}

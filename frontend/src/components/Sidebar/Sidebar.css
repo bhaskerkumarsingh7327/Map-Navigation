@@ -1,0 +1,294 @@
+/* .sidebar{
+
+width:270px;
+
+background:white;
+
+border-right:1px solid #e5e7eb;
+
+display:flex;
+
+flex-direction:column;
+
+justify-content:space-between;
+
+padding:26px 18px;
+
+}
+
+.sidebar-heading{
+
+font-size:12px;
+
+letter-spacing:2px;
+
+color:#94a3b8;
+
+margin-bottom:22px;
+
+}
+
+.sidebar-menu{
+
+display:flex;
+
+flex-direction:column;
+
+gap:10px;
+
+}
+
+.sidebar-menu button{
+
+height:54px;
+
+border:none;
+
+border-radius:16px;
+
+background:transparent;
+
+display:flex;
+
+align-items:center;
+
+gap:16px;
+
+padding:0 18px;
+
+cursor:pointer;
+
+font-size:15px;
+
+color:#334155;
+
+transition:.35s;
+
+}
+
+.sidebar-menu button svg{
+
+font-size:18px;
+
+}
+
+.sidebar-menu button:hover{
+
+background:#f1f5f9;
+
+transform:translateX(5px);
+
+}
+
+.sidebar-menu .active{
+
+background:#2563eb;
+
+color:white;
+
+box-shadow:0 10px 22px rgba(37,99,235,.25);
+
+}
+
+.sidebar-card{
+
+padding:22px;
+
+border-radius:22px;
+
+background:linear-gradient(135deg,#2563eb,#3b82f6);
+
+color:white;
+
+}
+
+.sidebar-card h3{
+
+font-size:22px;
+
+margin-bottom:12px;
+
+}
+
+.sidebar-card p{
+
+font-size:14px;
+
+line-height:1.6;
+
+opacity:.95;
+
+margin-bottom:18px;
+
+}
+
+.sidebar-card button{
+
+width:100%;
+
+height:48px;
+
+border:none;
+
+border-radius:14px;
+
+background:white;
+
+color:#2563eb;
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+gap:10px;
+
+font-weight:600;
+
+cursor:pointer;
+
+transition:.3s;
+
+}
+
+.sidebar-card button:hover{
+
+transform:translateY(-2px);
+
+} */
+ /* src/components/Sidebar/Sidebar.css */
+/* src/components/Sidebar/Sidebar.css */
+/* src/components/Sidebar/Sidebar.css */
+.apple-sidebar-container {
+  width: 260px;
+  background: #ffffff;
+  border-right: 1px solid #e5e5ea;
+  display: flex;
+  flex-direction: column;
+  padding: 32px 20px;
+  height: 100vh;
+  justify-content: space-between;
+}
+
+.sidebar-brand-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 36px;
+}
+
+.brand-vector-icon {
+  width: 20px;
+  height: 20px;
+  background: #007aff;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
+}
+
+.inner-pulse-core {
+  width: 8px;
+  height: 8px;
+  background: #ffffff;
+  border-radius: 50%;
+}
+
+.sidebar-brand-wrapper h2 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1c1c1e;
+  letter-spacing: -0.5px;
+}
+
+.sidebar-nav-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex-grow: 1;
+}
+
+.sidebar-nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 18px;
+  border: none;
+  background: transparent;
+  border-radius: 14px;
+  cursor: pointer;
+  text-align: left;
+  font-size: 14px;
+  font-weight: 600;
+  color: #8e8e93;
+  transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.sidebar-nav-btn:hover {
+  background: #f2f2f7;
+  color: #1c1c1e;
+  transform: translateX(4px);
+}
+
+.sidebar-nav-btn.is-active-pill {
+  background: #f2f2f7;
+  color: #007aff;
+}
+
+.nav-bullet-indicator {
+  width: 6px;
+  height: 6px;
+  background: #e5e5ea;
+  border-radius: 50%;
+  transition: all 0.25s;
+}
+
+.sidebar-nav-btn.is-active-pill .nav-bullet-indicator {
+  background: #007aff;
+  transform: scale(1.4);
+}
+
+.sidebar-footer-cta {
+  background: linear-gradient(135deg, #f2f2f7 0%, #e5e5ea 100%);
+  border-radius: 16px;
+  padding: 20px;
+  border: 1px solid rgba(0,0,0,0.02);
+}
+
+.sidebar-footer-cta h4 { font-size: 13px; font-weight: 700; color: #1c1c1e; margin-bottom: 4px; }
+.sidebar-footer-cta p { font-size: 11px; color: #8e8e93; line-height: 1.5; margin-bottom: 14px; }
+
+.cta-action-trigger {
+  width: 100%;
+  background: #007aff;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cta-action-trigger:hover {
+  background: #0056b3;
+  box-shadow: 0 4px 14px rgba(0, 122, 255, 0.3);
+}
+/* Sidebar Active Engine Transformations */
+.cta-action-trigger.system-active-glow {
+  background: #30d158;
+  color: #ffffff;
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(48, 209, 88, 0.4);
+  cursor: not-allowed;
+  animation: pulseGreen 2s infinite;
+}
+
+@keyframes pulseGreen {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.99); opacity: 0.9; }
+  100% { transform: scale(1); }
+}

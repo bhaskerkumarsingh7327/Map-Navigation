@@ -1,0 +1,211 @@
+/* .navbar{
+
+height:78px;
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+padding:0 30px;
+
+background:rgba(255,255,255,.94);
+
+backdrop-filter:blur(18px);
+
+border-bottom:1px solid #e2e8f0;
+
+box-shadow:0 6px 20px rgba(0,0,0,.04);
+
+z-index:2000;
+
+}
+
+.navbar-logo{
+
+display:flex;
+
+align-items:center;
+
+gap:15px;
+
+}
+
+.logo-icon{
+
+font-size:34px;
+
+color:#2563eb;
+
+}
+
+.navbar-logo h2{
+
+font-size:22px;
+
+color:#1e293b;
+
+}
+
+.navbar-logo span{
+
+font-size:12px;
+
+color:#94a3b8;
+
+}
+
+.navbar-search{
+
+width:460px;
+
+height:50px;
+
+display:flex;
+
+align-items:center;
+
+gap:12px;
+
+padding:0 18px;
+
+background:#f8fafc;
+
+border:1px solid #e2e8f0;
+
+border-radius:16px;
+
+transition:.35s;
+
+}
+
+.navbar-search:focus-within{
+
+border-color:#2563eb;
+
+box-shadow:0 0 0 4px rgba(37,99,235,.08);
+
+}
+
+.search-icon{
+
+color:#94a3b8;
+
+}
+
+.navbar-search input{
+
+flex:1;
+
+border:none;
+
+outline:none;
+
+background:transparent;
+
+font-size:15px;
+
+}
+
+.navbar-right{
+
+display:flex;
+
+gap:12px;
+
+}
+
+.navbar-right button{
+
+width:48px;
+
+height:48px;
+
+border:none;
+
+border-radius:15px;
+
+background:#f8fafc;
+
+cursor:pointer;
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+font-size:18px;
+
+transition:.3s;
+
+}
+
+.navbar-right button:hover{
+
+background:#2563eb;
+
+color:white;
+
+transform:translateY(-2px);
+
+}
+
+.profile-btn{
+
+font-size:25px !important;
+
+} */
+ .global-navbar {
+  height: 70px;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  width: 100%;
+}
+
+.nav-input-node {
+  width: 460px;
+  padding: 10px 20px;
+  border-radius: 24px;
+  border: 1px solid #e2e8f0;
+  background: #f1f5f9;
+  outline: none;
+  font-size: 13px;
+  transition: border-color 0.2s;
+}
+
+.nav-input-node:focus {
+  border-color: #3b82f6;
+  background: #ffffff;
+}
+
+.navbar-user-controls {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.btn-theme-switch {
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.user-profile-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 13px;
+  color: #1e293b;
+  cursor: pointer;
+}
