@@ -1,42 +1,119 @@
-/* src/pages/History/HistoryPage.css */
+/* src/pages/HistoryPage.css */
+
+.history-header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.btn-clear-history {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fce8e6;
+  color: #ea4335;
+  border: 1px solid #fad2cf;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-clear-history:hover {
+  background: #ea4335;
+  color: #ffffff;
+}
+
 .table-viewport-frame {
-  border: 1px solid rgba(0,0,0,0.05);
+  border: 1px solid #e8eaed;
   border-radius: 16px;
   overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
 }
 
 .enterprise-data-grid {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .enterprise-data-grid th {
-  background: #f2f2f7;
-  padding: 16px 24px;
-  color: #636366;
+  background: #f8f9fa;
+  padding: 14px 18px;
+  color: #5f6368;
   font-weight: 700;
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  border-bottom: 1px solid #e8eaed;
 }
 
 .enterprise-data-grid td {
-  padding: 18px 24px;
-  border-bottom: 1px solid #f2f2f7;
-  color: #1c1c1e;
-}
-
-.data-row-item-interactive {
-  transition: background 0.2s ease;
+  padding: 16px 18px;
+  border-bottom: 1px solid #f1f3f4;
+  color: #202124;
 }
 
 .data-row-item-interactive:hover {
-  background: #f2f2f7;
+  background: #f8f9fa;
 }
 
-.id-code-token { background: #e5e5ea; padding: 4px 8px; border-radius: 6px; font-size: 12px; }
-.node-text-weight { font-weight: 600; }
-.algo-instance-pill { background: #e5f1ff; color: #007aff; padding: 4px 10px; border-radius: 8px; font-weight: 700; font-size: 12px; }
-.cost-metric-txt { font-weight: 700; color: #1c1c1e; }
+.log-date-txt {
+  font-size: 12px;
+  color: #5f6368;
+}
+
+.log-mode-icon {
+  font-size: 15px;
+  color: #1a73e8;
+  display: flex;
+  align-items: center;
+}
+
+.node-text-weight {
+  font-weight: 600;
+}
+
+.node-text-weight.text-blue {
+  color: #1a73e8;
+}
+
+.cost-metric-txt {
+  font-weight: 700;
+  color: #0f9d58;
+}
+
+.btn-reroute-action {
+  background: #1a73e8;
+  color: #ffffff;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.btn-reroute-action:hover {
+  background: #1557b0;
+}
+
+.empty-history-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #5f6368;
+}
+
+.empty-history-icon {
+  font-size: 40px;
+  color: #dadce0;
+  margin-bottom: 12px;
+}

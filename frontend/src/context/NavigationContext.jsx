@@ -1,111 +1,483 @@
-// // src/context/NavigationContext.jsx
-// import React, { createContext, useState, useContext } from 'react';
-
-// const NavigationContext = createContext();
-
-// export const NavigationProvider = ({ children }) => {
-//   const [source, setSource] = useState('Patna, Bihar, India');
-//   const [destination, setDestination] = useState('Nalanda, Bihar, India');
-//   const [routePreference, setRoutePreference] = useState('Fastest Route');
-//   const [routeInfo, setRouteInfo] = useState({
-//     distance: '88.4 KM',
-//     estimatedTime: '1 hr 45 min',
-//     trafficCondition: 'Moderate',
-//     roadType: 'Highway',
-//   });
-//   const [routeCoordinates, setRouteCoordinates] = useState([
-//     [25.611, 85.144], // Patna
-//     [25.300, 85.300], // Intermediate point
-//     [25.135, 85.454], // Nalanda
-//   ]);
-
-//   return (
-//     <NavigationContext.Provider
-//       value={{
-//         source,
-//         setSource,
-//         destination,
-//         setDestination,
-//         routePreference,
-//         setRoutePreference,
-//         routeInfo,
-//         setRouteInfo,
-//         routeCoordinates,
-//         setRouteCoordinates,
-//       }}
-//     >
-//       {children}
-//     </NavigationContext.Provider>
-//   );
-// };
-
-// export const useNavigation = () => useContext(NavigationContext);
 // src/context/NavigationContext.jsx
-
-import React, { createContext, useState, useContext } from "react";
+import React, { createContext, useState, useContext, useEffect, useRef } from "react";
+import {
+  getShortestPath,
+  searchLocation,
+  reverseGeocode,
+  getNearbyPlaces,
+  PREDEFINED_LOCATIONS
+} from "../services/api";
 
 const NavigationContext = createContext();
 
 export const NavigationProvider = ({ children }) => {
-  // Existing States
+  // 1. Core Source & Destination States
   const [source, setSource] = useState("Patna, Bihar, India");
-
+  const [sourceCoords, setSourceCoords] = useState([25.6110, 85.1440]);
   const [destination, setDestination] = useState("Nalanda, Bihar, India");
+  const [destinationCoords, setDestinationCoords] = useState([25.1350, 85.4540]);
 
-  const [routePreference, setRoutePreference] =
-    useState("Fastest Route");
+  // 2. Travel & Route Options
+  const [travelMode, setTravelMode] = useState("driving"); // driving, motorcycle, walking, cycling, transit
+  const [routePreference, setRoutePreference] = useState("Fastest Route");
+  const [routingEngine, setRoutingEngine] = useState("auto"); // auto, osrm, cpp
 
+  // 3. Calculated Route States
   const [routeInfo, setRouteInfo] = useState({
     distance: "88.4 KM",
+    distanceValue: 88.4,
     estimatedTime: "1 hr 45 min",
-    trafficCondition: "Moderate",
-    roadType: "Highway",
+    travelTimeMinutes: 105,
+    arrivalTime: "11:45 PM",
+    trafficCondition: "Moderate Traffic",
+    roadType: "National Highway NH 31",
+    fuelEstimate: "≈ 6.2 L",
+    tollCount: "1 Toll Road"
   });
 
   const [routeCoordinates, setRouteCoordinates] = useState([
-    [25.611, 85.144],
-    [25.300, 85.300],
-    [25.135, 85.454],
+    [25.6110, 85.1440],
+    [25.4800, 85.2200],
+    [25.3200, 85.3400],
+    [25.1350, 85.4540]
   ]);
 
-  // -------------------------------
-  // Backend Integration States
-  // -------------------------------
+  const [steps, setSteps] = useState([
+    {
+      id: 0,
+      instruction: "Head east on Bailey Road / NH 30",
+      streetName: "Bailey Road",
+      distance: "2.4 km",
+      duration: "6 min",
+      type: "depart",
+      icon: "start"
+    },
+    {
+      id: 1,
+      instruction: "Turn right onto NH 31 Highway Corridor",
+      streetName: "NH 31",
+      distance: "62.0 km",
+      duration: "1 hr 12 min",
+      type: "turn",
+      icon: "right"
+    },
+    {
+      id: 2,
+      instruction: "Continue straight past Bakhtiyarpur Junction",
+      streetName: "NH 31 Express",
+      distance: "18.0 km",
+      duration: "20 min",
+      type: "continue",
+      icon: "straight"
+    },
+    {
+      id: 3,
+      instruction: "Arrive at Nalanda Historical Site",
+      streetName: "Nalanda Heritage Road",
+      distance: "6.0 km",
+      duration: "7 min",
+      type: "arrive",
+      icon: "finish"
+    }
+  ]);
 
-  const [routeData, setRouteData] = useState(null);
+  const [alternativeRoutes, setAlternativeRoutes] = useState([]);
+  const [activeRouteIndex, setActiveRouteIndex] = useState(0);
+  const [isDirectionsOpen, setIsDirectionsOpen] = useState(true);
+  const [isRoutePanelOpen, setIsRoutePanelOpen] = useState(true);
+
+  // 4. Live GPS Turn-by-Turn Navigation Simulation States
+  const [isNavigating, setIsNavigating] = useState(false);
+  const [navigationProgress, setNavigationProgress] = useState({
+    currentStepIndex: 0,
+    currentCoordIndex: 0,
+    speed: 48,
+    remainingDistance: "88.4 KM",
+    remainingTime: "1 hr 45 min",
+    currentLocation: [25.6110, 85.1440],
+    bearing: 90,
+    nextManeuver: "Head east on Bailey Road"
+  });
+  const [isMuted, setIsMuted] = useState(false);
+  const navigationTimerRef = useRef(null);
+
+  // 5. Map Styling & UI Options
+  const [mapTheme, setMapTheme] = useState("standard"); // standard, satellite, dark, terrain
+  const [trafficLayerActive, setTrafficLayerActive] = useState(true);
+  const [mapCenter, setMapCenter] = useState([25.6110, 85.1440]);
+  const [mapZoom, setMapZoom] = useState(11);
+
+  // 6. Nearby POIs
+  const [nearbyPOIs, setNearbyPOIs] = useState([]);
+  const [activeNearbyCategory, setActiveNearbyCategory] = useState("All");
+
+  // 7. Persistent User Data (LocalStorage)
+  const [savedPlaces, setSavedPlaces] = useState(() => {
+    try {
+      const stored = localStorage.getItem("gmaps_saved_places");
+      if (stored) return JSON.parse(stored);
+    } catch (e) {}
+    return [
+      { id: 1, name: "Home (Patna)", category: "Home", address: "Boring Road, Patna, Bihar", lat: 25.6172, lng: 85.1189 },
+      { id: 2, name: "Amity Campus", category: "Work", address: "Bailey Road Extension, Patna", lat: 25.5892, lng: 85.0592 },
+      { id: 3, name: "Nalanda Ancient Ruins", category: "Favorites", address: "Nalanda Heritage Area, Bihar", lat: 25.1350, lng: 85.4540 }
+    ];
+  });
+
+  const [history, setHistory] = useState(() => {
+    try {
+      const stored = localStorage.getItem("gmaps_history");
+      if (stored) return JSON.parse(stored);
+    } catch (e) {}
+    return [
+      {
+        id: "tx-1",
+        from: "Patna, Bihar",
+        to: "Nalanda, Bihar",
+        distance: "88.4 KM",
+        duration: "1 hr 45 min",
+        mode: "driving",
+        date: "Today, 10:30 AM"
+      },
+      {
+        id: "tx-2",
+        from: "Patna Junction",
+        to: "AIIMS Patna",
+        distance: "14.2 KM",
+        duration: "32 min",
+        mode: "driving",
+        date: "Yesterday, 4:15 PM"
+      }
+    ];
+  });
 
   const [loading, setLoading] = useState(false);
-
   const [error, setError] = useState(null);
+
+  // Save to LocalStorage on updates
+  useEffect(() => {
+    try {
+      localStorage.setItem("gmaps_saved_places", JSON.stringify(savedPlaces));
+    } catch (e) {}
+  }, [savedPlaces]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("gmaps_history", JSON.stringify(history));
+    } catch (e) {}
+  }, [history]);
+
+  // Initial calculation & POIs load on application startup
+  useEffect(() => {
+    calculateRoute("Patna, Bihar, India", "Nalanda, Bihar, India");
+    searchNearby("All");
+  }, []);
+
+  // Voice speech synthesis helper
+  const speakInstruction = (text) => {
+    if (isMuted || !window.speechSynthesis) return;
+    try {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 1.0;
+      utterance.pitch = 1.0;
+      utterance.lang = "en-US";
+      window.speechSynthesis.speak(utterance);
+    } catch (e) {}
+  };
+
+  // Main Route Calculation
+  const calculateRoute = async (srcInput = source, dstInput = destination, mode = travelMode) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const result = await getShortestPath(srcInput, dstInput, {
+        mode,
+        preference: routePreference,
+        engine: routingEngine
+      });
+
+      if (result.success && result.data) {
+        const {
+          distance,
+          estimatedTime,
+          arrivalTime,
+          trafficCondition,
+          roadType,
+          coordinates,
+          steps: routeSteps,
+          alternativeRoutes: alts,
+          fuelEstimate,
+          tollCount
+        } = result.data;
+
+        setRouteInfo({
+          distance: distance || "88.4 KM",
+          estimatedTime: estimatedTime || "1 hr 45 min",
+          arrivalTime: arrivalTime || "Arrive by 11:45 PM",
+          trafficCondition: trafficCondition || "Normal",
+          roadType: roadType || "Highway",
+          fuelEstimate: fuelEstimate || "≈ 5.8 L",
+          tollCount: tollCount || "1 Toll"
+        });
+
+        if (coordinates && coordinates.length > 0) {
+          setRouteCoordinates(coordinates);
+          setSourceCoords(coordinates[0]);
+          setDestinationCoords(coordinates[coordinates.length - 1]);
+          setMapCenter(coordinates[0]);
+        }
+
+        if (routeSteps && routeSteps.length > 0) {
+          setSteps(routeSteps);
+        }
+
+        setAlternativeRoutes(alts || []);
+        setActiveRouteIndex(0);
+
+        // Add to history
+        const newHistoryItem = {
+          id: `tx-${Date.now()}`,
+          from: typeof srcInput === "string" ? srcInput : srcInput.name,
+          to: typeof dstInput === "string" ? dstInput : dstInput.name,
+          distance: distance || "88 KM",
+          duration: estimatedTime || "1 hr 45 min",
+          mode,
+          date: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) + ", Today"
+        };
+        setHistory(prev => [newHistoryItem, ...prev.slice(0, 19)]);
+      } else {
+        setError("Unable to calculate route. Using default path.");
+      }
+    } catch (err) {
+      console.error("Routing error:", err);
+      setError("Routing service unavailable.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Switch between primary and alternative routes
+  const selectAlternativeRoute = (index) => {
+    if (index === 0) {
+      setActiveRouteIndex(0);
+      return;
+    }
+    const alt = alternativeRoutes[index - 1];
+    if (alt) {
+      setActiveRouteIndex(index);
+      setRouteCoordinates(alt.coordinates);
+      setRouteInfo(prev => ({
+        ...prev,
+        distance: alt.distance,
+        estimatedTime: alt.estimatedTime
+      }));
+    }
+  };
+
+  // Swap Origin and Destination
+  const swapLocations = () => {
+    const tempSrc = source;
+    const tempSrcCoords = sourceCoords;
+    setSource(destination);
+    setSourceCoords(destinationCoords);
+    setDestination(tempSrc);
+    setDestinationCoords(tempSrcCoords);
+    calculateRoute(destination, tempSrc);
+  };
+
+  // Use HTML5 Geolocation to set current user location
+  const useCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser.");
+      return;
+    }
+
+    setLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const { latitude, longitude } = pos.coords;
+        const rev = await reverseGeocode(latitude, longitude);
+        setSource(rev.displayName || `My Location (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`);
+        setSourceCoords([latitude, longitude]);
+        setMapCenter([latitude, longitude]);
+        setMapZoom(14);
+        setLoading(false);
+        calculateRoute({ name: rev.name, lat: latitude, lng: longitude }, destination);
+      },
+      (err) => {
+        console.warn("Geolocation error, fallback to default Patna location:", err.message);
+        setSource("Patna Junction, Bihar");
+        setSourceCoords([25.6025, 85.1376]);
+        setLoading(false);
+      },
+      { timeout: 8000 }
+    );
+  };
+
+  // Start Real-Time Turn-by-Turn Navigation Simulation
+  const startNavigation = () => {
+    if (!routeCoordinates || routeCoordinates.length === 0) return;
+
+    setIsNavigating(true);
+    const firstStepText = steps.length > 0 ? steps[0].instruction : "Proceed along highlighted route";
+    speakInstruction(`Starting navigation to ${destination}. ${firstStepText}`);
+
+    let coordIdx = 0;
+    let stepIdx = 0;
+
+    if (navigationTimerRef.current) clearInterval(navigationTimerRef.current);
+
+    navigationTimerRef.current = setInterval(() => {
+      coordIdx++;
+      if (coordIdx >= routeCoordinates.length) {
+        clearInterval(navigationTimerRef.current);
+        speakInstruction("You have reached your destination.");
+        setIsNavigating(false);
+        return;
+      }
+
+      const currentPos = routeCoordinates[coordIdx];
+      const prevPos = routeCoordinates[coordIdx - 1];
+
+      // Calculate bearing angle for car icon rotation
+      const dLon = (currentPos[1] - prevPos[1]) * (Math.PI / 180);
+      const lat1 = prevPos[0] * (Math.PI / 180);
+      const lat2 = currentPos[0] * (Math.PI / 180);
+      const y = Math.sin(dLon) * Math.cos(lat2);
+      const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLon);
+      const bearing = (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
+
+      // Progress percentages
+      const fraction = coordIdx / routeCoordinates.length;
+      const remainingKm = ((routeInfo.distanceValue || 88) * (1 - fraction)).toFixed(1);
+      const remainingMins = Math.max(1, Math.round((routeInfo.travelTimeMinutes || 105) * (1 - fraction)));
+      const hours = Math.floor(remainingMins / 60);
+      const mins = remainingMins % 60;
+      const remainingTime = hours > 0 ? `${hours} hr ${mins} min` : `${mins} min`;
+
+      // Next step logic
+      const targetStepIdx = Math.min(
+        steps.length - 1,
+        Math.floor(fraction * steps.length)
+      );
+      if (targetStepIdx !== stepIdx) {
+        stepIdx = targetStepIdx;
+        if (steps[stepIdx]) {
+          speakInstruction(`In 300 meters, ${steps[stepIdx].instruction}`);
+        }
+      }
+
+      setNavigationProgress({
+        currentStepIndex: stepIdx,
+        currentCoordIndex: coordIdx,
+        speed: Math.floor(40 + Math.random() * 15),
+        remainingDistance: `${remainingKm} KM`,
+        remainingTime,
+        currentLocation: currentPos,
+        bearing,
+        nextManeuver: steps[stepIdx] ? steps[stepIdx].instruction : "Continue on route"
+      });
+    }, 1200);
+  };
+
+  const stopNavigation = () => {
+    if (navigationTimerRef.current) clearInterval(navigationTimerRef.current);
+    setIsNavigating(false);
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
+  };
+
+  // Nearby Places
+  const searchNearby = async (category = "All") => {
+    setActiveNearbyCategory(category);
+    const center = sourceCoords || [25.6110, 85.1440];
+    const results = await getNearbyPlaces(category, center);
+    setNearbyPOIs(results);
+  };
+
+  // Saved Places methods
+  const savePlace = (place) => {
+    const newItem = {
+      id: Date.now(),
+      name: place.name || "Custom Saved Location",
+      category: place.category || "Favorites",
+      address: place.address || place.displayName || `${place.lat.toFixed(4)}, ${place.lng.toFixed(4)}`,
+      lat: place.lat,
+      lng: place.lng
+    };
+    setSavedPlaces(prev => [newItem, ...prev]);
+  };
+
+  const removeSavedPlace = (id) => {
+    setSavedPlaces(prev => prev.filter(p => p.id !== id));
+  };
+
+  // Clear History
+  const clearHistory = () => {
+    setHistory([]);
+    try {
+      localStorage.removeItem("gmaps_history");
+    } catch (e) {}
+  };
 
   return (
     <NavigationContext.Provider
       value={{
-        // Existing
         source,
         setSource,
-
+        sourceCoords,
+        setSourceCoords,
         destination,
         setDestination,
-
+        destinationCoords,
+        setDestinationCoords,
+        travelMode,
+        setTravelMode,
         routePreference,
         setRoutePreference,
-
+        routingEngine,
+        setRoutingEngine,
         routeInfo,
         setRouteInfo,
-
         routeCoordinates,
         setRouteCoordinates,
-
-        // Backend
-        routeData,
-        setRouteData,
-
+        steps,
+        setSteps,
+        alternativeRoutes,
+        activeRouteIndex,
+        selectAlternativeRoute,
+        isNavigating,
+        navigationProgress,
+        startNavigation,
+        stopNavigation,
+        isMuted,
+        setIsMuted,
+        mapTheme,
+        setMapTheme,
+        trafficLayerActive,
+        setTrafficLayerActive,
+        mapCenter,
+        setMapCenter,
+        mapZoom,
+        setMapZoom,
+        nearbyPOIs,
+        activeNearbyCategory,
+        searchNearby,
+        savedPlaces,
+        savePlace,
+        removeSavedPlace,
+        history,
+        clearHistory,
+        calculateRoute,
+        swapLocations,
+        useCurrentLocation,
+        isDirectionsOpen,
+        setIsDirectionsOpen,
+        isRoutePanelOpen,
+        setIsRoutePanelOpen,
         loading,
-        setLoading,
-
-        error,
-        setError,
+        error
       }}
     >
       {children}

@@ -1,332 +1,234 @@
-// import "./RoutePanel.css";
-
-// import {
-//   FaClock,
-//   FaRoad,
-//   FaGasPump,
-//   FaTrafficLight,
-//   FaRoute,
-//   FaLeaf
-// } from "react-icons/fa";
-
-// function RoutePanel() {
-//   return (
-//     <div className="route-card">
-
-//       <h2>Route Overview</h2>
-
-//       <div className="route-stats">
-
-//         <div className="stat">
-//           <FaRoad />
-//           <div>
-//             <span>Distance</span>
-//             <h3>82 km</h3>
-//           </div>
-//         </div>
-
-//         <div className="stat">
-//           <FaClock />
-//           <div>
-//             <span>ETA</span>
-//             <h3>1 hr 42 min</h3>
-//           </div>
-//         </div>
-
-//       </div>
-
-//       <div className="route-type">
-
-//         <div className="option active">
-//           <FaRoute />
-//           <div>
-//             <h4>Fastest</h4>
-//             <p>1h 42m</p>
-//           </div>
-//         </div>
-
-//         <div className="option">
-//           <FaLeaf />
-//           <div>
-//             <h4>Eco</h4>
-//             <p>1h 55m</p>
-//           </div>
-//         </div>
-
-//       </div>
-
-//       <div className="info-box">
-
-//         <div>
-//           <FaTrafficLight />
-//           <span>Traffic</span>
-//           <strong>Moderate</strong>
-//         </div>
-
-//         <div>
-//           <FaGasPump />
-//           <span>Fuel</span>
-//           <strong>≈ 5.8 L</strong>
-//         </div>
-
-//       </div>
-
-//       <button className="navigate-btn">
-
-//         Start Navigation
-
-//       </button>
-
-//     </div>
-//   );
-// }
-
-// export default RoutePanel;
-
-// import React from 'react';
-// import { useNavigation } from '../../context/NavigationContext';
-// import './RoutePanel.css';
-
-// export default function RoutePanel() {
-//   const { routeInfo } = useNavigation();
-
-//   return (
-//     <div className="premium-analytics-sidebar-card">
-//       <div className="panel-header-section">
-//         <h3>Route Information</h3>
-//       </div>
-
-//       <div className="metrics-grid-stack">
-//         <div className="metric-row-item">
-//           <span className="lbl-node">Distance</span>
-//           <span className="val-node">{routeInfo.distance}</span>
-//         </div>
-//         <div className="metric-row-item">
-//           <span className="lbl-node">Estimated Time</span>
-//           <span className="val-node-highlight">{routeInfo.estimatedTime}</span>
-//         </div>
-//         <div className="metric-row-item">
-//           <span className="lbl-node">Traffic Condition</span>
-//           <span className="val-node status-warning-pill">{routeInfo.trafficCondition}</span>
-//         </div>
-//         <div className="metric-row-item">
-//           <span className="lbl-node">Road Type</span>
-//           <span className="val-node">Highway</span>
-//         </div>
-//       </div>
-
-//       <hr className="divider-soft" />
-
-//       <div className="route-comparison-module">
-//         <h4>Route Overview</h4>
-//         <div className="progress-gradient-track">
-//           <div className="fill-chunk fill-red" style={{ width: '60%' }}></div>
-//           <div className="fill-chunk fill-blue" style={{ width: '40%' }}></div>
-//         </div>
-
-//         <div className="comparison-flex-box">
-//           <div className="comp-block active-comp">
-//             <span className="comp-title">Fastest</span>
-//             <span className="comp-meta text-green">1 hr 45 min</span>
-//           </div>
-//           <div className="comp-block">
-//             <span className="comp-title">Shortest</span>
-//             <span className="comp-meta">95.2 KM</span>
-//           </div>
-//         </div>
-//       </div>
-
-//       <div className="alternative-routes-section">
-//         <h4>Alternative Routes</h4>
-//         <div className="alt-route-list-node">
-//           <span className="alt-route-title">Via NH 31</span>
-//           <span className="alt-route-time">1 hr 55 min</span>
-//         </div>
-//         <div className="alt-route-list-node">
-//           <span className="alt-route-title">Via NH 20</span>
-//           <span className="alt-route-time">2 hr 05 min</span>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
-import React from "react";
+// src/components/RoutePanel/RoutePanel.jsx
+import React, { useState } from "react";
 import { useNavigation } from "../../context/NavigationContext";
+import {
+  FaClock,
+  FaRoad,
+  FaGasPump,
+  FaTrafficLight,
+  FaRoute,
+  FaPlay,
+  FaBookmark,
+  FaShareAlt,
+  FaChevronDown,
+  FaChevronUp,
+  FaArrowLeft,
+  FaArrowRight,
+  FaArrowUp,
+  FaRedo,
+  FaMapMarkerAlt,
+  FaCheck
+} from "react-icons/fa";
 import "./RoutePanel.css";
 
 export default function RoutePanel() {
-
   const {
+    source,
+    destination,
     routeInfo,
-    routeData,
-    loading,
-    error,
+    steps,
+    alternativeRoutes,
+    activeRouteIndex,
+    selectAlternativeRoute,
+    startNavigation,
+    isNavigating,
+    savePlace,
+    setIsRoutePanelOpen
   } = useNavigation();
 
+  const [stepsExpanded, setStepsExpanded] = useState(true);
+  const [copied, setCopied] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  const handleShare = () => {
+    navigator.clipboard?.writeText(window.location.href);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
+  };
+
+  const handleSaveRoute = () => {
+    savePlace({
+      name: `${source.split(",")[0]} to ${destination.split(",")[0]}`,
+      category: "Saved Routes",
+      address: `${routeInfo.distance} • ${routeInfo.estimatedTime}`
+    });
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2500);
+  };
+
+  const renderStepIcon = (iconType) => {
+    switch (iconType) {
+      case "left":
+        return <FaArrowLeft className="step-icon step-icon-turn" />;
+      case "right":
+        return <FaArrowRight className="step-icon step-icon-turn" />;
+      case "roundabout":
+      case "uturn":
+        return <FaRedo className="step-icon step-icon-turn" />;
+      case "finish":
+        return <FaMapMarkerAlt className="step-icon step-icon-dest" />;
+      default:
+        return <FaArrowUp className="step-icon step-icon-straight" />;
+    }
+  };
+
   return (
-    <div className="premium-analytics-sidebar-card">
+    <div className="google-route-overview-panel">
+      {/* 1. Header ETA & Summary */}
+      <div className="panel-summary-card">
+        <div className="summary-headline-row">
+          <div className="time-eta-block">
+            <span className="big-eta-time">{routeInfo.estimatedTime}</span>
+            <span className="small-eta-arrival">({routeInfo.arrivalTime})</span>
+          </div>
+          <div className="headline-right-actions">
+            <div className={`traffic-badge-pill ${routeInfo.trafficCondition?.includes("Heavy") ? "traffic-heavy" : "traffic-normal"}`}>
+              ● {routeInfo.trafficCondition}
+            </div>
+            <button
+              type="button"
+              className="btn-close-route-panel"
+              onClick={() => setIsRoutePanelOpen(false)}
+              title="Minimize Route Details"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
 
-      <div className="panel-header-section">
-        <h3>Route Information</h3>
-      </div>
+        <div className="summary-meta-row">
+          <span className="meta-distance">{routeInfo.distance}</span>
+          <span className="meta-dot">•</span>
+          <span className="meta-road-type">{routeInfo.roadType}</span>
+        </div>
 
-      {loading && (
-        <p style={{ marginBottom: "12px" }}>
-          Calculating Route...
-        </p>
-      )}
-
-      {error && (
-        <p
-          style={{
-            color: "red",
-            marginBottom: "12px",
-          }}
+        {/* 2. Main Google "Start" Navigation Action Button */}
+        <button
+          className={`btn-start-navigation ${isNavigating ? "is-active-nav" : ""}`}
+          onClick={startNavigation}
         >
-          {error}
-        </p>
+          <FaPlay className="play-icon-tri" />
+          <span>{isNavigating ? "Navigation in Progress" : "Start Navigation"}</span>
+        </button>
+
+        {/* 3. Quick Actions: Save & Share */}
+        <div className="route-quick-actions-row">
+          <button
+            type="button"
+            className={`quick-action-pill ${saved ? "action-done" : ""}`}
+            onClick={handleSaveRoute}
+          >
+            {saved ? <FaCheck /> : <FaBookmark />}
+            <span>{saved ? "Saved" : "Save Route"}</span>
+          </button>
+
+          <button
+            type="button"
+            className={`quick-action-pill ${copied ? "action-done" : ""}`}
+            onClick={handleShare}
+          >
+            {copied ? <FaCheck /> : <FaShareAlt />}
+            <span>{copied ? "Link Copied" : "Share"}</span>
+          </button>
+        </div>
+      </div>
+
+      {/* 4. Alternative Routes Options */}
+      {alternativeRoutes && alternativeRoutes.length > 0 && (
+        <div className="alt-routes-selector-box">
+          <h4 className="alt-section-title">Route Choices</h4>
+          <div className="alt-cards-stack">
+            {/* Primary Route */}
+            <div
+              className={`alt-route-card ${activeRouteIndex === 0 ? "alt-card-selected" : ""}`}
+              onClick={() => selectAlternativeRoute(0)}
+            >
+              <div className="alt-card-left">
+                <strong>Primary Route</strong>
+                <span>Fastest route with typical traffic</span>
+              </div>
+              <div className="alt-card-right">
+                <span className="alt-time-text">{routeInfo.estimatedTime}</span>
+                <span className="alt-dist-text">{routeInfo.distance}</span>
+              </div>
+            </div>
+
+            {/* Alternative routes from engine */}
+            {alternativeRoutes.map((alt, idx) => (
+              <div
+                key={`alt-choice-${idx}`}
+                className={`alt-route-card ${activeRouteIndex === idx + 1 ? "alt-card-selected" : ""}`}
+                onClick={() => selectAlternativeRoute(idx + 1)}
+              >
+                <div className="alt-card-left">
+                  <strong>{alt.name}</strong>
+                  <span className="alt-diff-warning">{alt.diffText || "Alternative Path"}</span>
+                </div>
+                <div className="alt-card-right">
+                  <span className="alt-time-text">{alt.estimatedTime}</span>
+                  <span className="alt-dist-text">{alt.distance}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       )}
 
-      <div className="metrics-grid-stack">
-
-        <div className="metric-row-item">
-          <span className="lbl-node">
-            Distance
-          </span>
-
-          <span className="val-node">
-            {routeInfo.distance}
-          </span>
-        </div>
-
-        <div className="metric-row-item">
-
-          <span className="lbl-node">
-            Estimated Time
-          </span>
-
-          <span className="val-node-highlight">
-            {routeInfo.estimatedTime}
-          </span>
-
-        </div>
-
-        <div className="metric-row-item">
-
-          <span className="lbl-node">
-            Traffic Condition
-          </span>
-
-          <span className="val-node status-warning-pill">
-            {routeInfo.trafficCondition}
-          </span>
-
-        </div>
-
-        <div className="metric-row-item">
-
-          <span className="lbl-node">
-            Road Type
-          </span>
-
-          <span className="val-node">
-            {routeInfo.roadType}
-          </span>
-
-        </div>
-
-      </div>
-
-      <hr className="divider-soft" />
-
-      <div className="route-comparison-module">
-
-        <h4>
-          Route Overview
-        </h4>
-
-        <div className="progress-gradient-track">
-
-          <div
-            className="fill-chunk fill-red"
-            style={{ width: "60%" }}
-          ></div>
-
-          <div
-            className="fill-chunk fill-blue"
-            style={{ width: "40%" }}
-          ></div>
-
-        </div>
-
-        <div className="comparison-flex-box">
-
-          <div className="comp-block active-comp">
-
-            <span className="comp-title">
-              Fastest
-            </span>
-
-            <span className="comp-meta text-green">
-              {routeInfo.estimatedTime}
-            </span>
-
+      {/* 5. Route Diagnostics & Resource Metrics */}
+      <div className="route-diagnostics-metrics-grid">
+        <div className="metric-box">
+          <FaGasPump className="metric-icon" />
+          <div className="metric-text-group">
+            <span className="metric-label">Estimated Fuel</span>
+            <strong>{routeInfo.fuelEstimate || "≈ 5.8 L"}</strong>
           </div>
+        </div>
 
-          <div className="comp-block">
-
-            <span className="comp-title">
-              Shortest
-            </span>
-
-            <span className="comp-meta">
-              {routeInfo.distance}
-            </span>
-
+        <div className="metric-box">
+          <FaRoad className="metric-icon" />
+          <div className="metric-text-group">
+            <span className="metric-label">Toll Passages</span>
+            <strong>{routeInfo.tollCount || "No Tolls"}</strong>
           </div>
-
         </div>
-
       </div>
 
-      <div className="alternative-routes-section">
-
-        <h4>
-          Alternative Routes
-        </h4>
-
-        <div className="alt-route-list-node">
-
-          <span className="alt-route-title">
-            Via NH 31
-          </span>
-
-          <span className="alt-route-time">
-            {routeInfo.estimatedTime}
-          </span>
-
+      {/* 6. Step-by-Step Directions Accordion */}
+      <div className="turn-by-turn-accordion-container">
+        <div
+          className="accordion-header-toggle"
+          onClick={() => setStepsExpanded(!stepsExpanded)}
+        >
+          <div className="accordion-title-flex">
+            <FaRoute className="route-accordion-icon" />
+            <h4>Step-by-Step Directions ({steps.length})</h4>
+          </div>
+          {stepsExpanded ? <FaChevronUp /> : <FaChevronDown />}
         </div>
 
-        <div className="alt-route-list-node">
-
-          <span className="alt-route-title">
-            Via NH 20
-          </span>
-
-          <span className="alt-route-time">
-
-            {routeData
-              ? "Available"
-              : "Pending"}
-
-          </span>
-
-        </div>
-
+        {stepsExpanded && (
+          <div className="steps-timeline-list">
+            {steps.map((step, index) => (
+              <div key={`step-row-${step.id || index}`} className="step-timeline-item">
+                <div className="step-icon-spine">
+                  <div className="step-icon-circle">
+                    {renderStepIcon(step.icon)}
+                  </div>
+                  {index < steps.length - 1 && <div className="spine-vertical-bar"></div>}
+                </div>
+                <div className="step-body-content">
+                  <p className="step-instruction-text">{step.instruction}</p>
+                  <div className="step-sub-metrics">
+                    <span>{step.distance}</span>
+                    <span>&bull;</span>
+                    <span>{step.duration}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
-
     </div>
   );
-
 }

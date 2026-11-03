@@ -1,151 +1,80 @@
-// import "./Sidebar.css";
-
-// import {
-//   FaCompass,
-//   FaRoute,
-//   FaMapMarkedAlt,
-//   FaTrafficLight,
-//   FaHistory,
-//   FaHeart,
-//   FaCog,
-//   FaArrowRight
-// } from "react-icons/fa";
-
-// function Sidebar() {
-
-//   return (
-
-//     <aside className="sidebar">
-
-//       <div>
-
-//         <h5 className="sidebar-heading">
-//           MAIN MENU
-//         </h5>
-
-//         <nav className="sidebar-menu">
-
-//           <button className="active">
-//             <FaCompass />
-//             <span>Dashboard</span>
-//           </button>
-
-//           <button>
-//             <FaMapMarkedAlt />
-//             <span>Explore</span>
-//           </button>
-
-//           <button>
-//             <FaRoute />
-//             <span>Live Navigation</span>
-//           </button>
-
-//           <button>
-//             <FaTrafficLight />
-//             <span>Traffic</span>
-//           </button>
-
-//           <button>
-//             <FaHistory />
-//             <span>History</span>
-//           </button>
-
-//           <button>
-//             <FaHeart />
-//             <span>Saved Routes</span>
-//           </button>
-
-//           <button>
-//             <FaCog />
-//             <span>Settings</span>
-//           </button>
-
-//         </nav>
-
-//       </div>
-
-//       <div className="sidebar-card">
-
-//         <h3>Navigation AI</h3>
-
-//         <p>
-
-//           Discover smarter routes using
-//           Graph Algorithms & Real-time Navigation.
-
-//         </p>
-
-//         <button>
-
-//           Start Exploring
-
-//           <FaArrowRight />
-
-//         </button>
-
-//       </div>
-
-//     </aside>
-
-//   );
-
-// }
-
-// export default Sidebar;
 // src/components/Sidebar/Sidebar.jsx
-// src/components/Sidebar/Sidebar.jsx
-// src/components/Sidebar/Sidebar.jsx
-import React, { useState } from 'react';
-import './Sidebar.css';
+import React, { useState } from "react";
+import {
+  FaCompass,
+  FaRoute,
+  FaHistory,
+  FaBookmark,
+  FaTrafficLight,
+  FaMapMarkerAlt,
+  FaInfoCircle,
+  FaCog,
+  FaBolt
+} from "react-icons/fa";
+import "./Sidebar.css";
 
 export default function Sidebar({ activeTab, setActiveTab }) {
-  const menuItems = ['Home', 'Navigation', 'History', 'Saved', 'Traffic', 'Nearby', 'About', 'Settings'];
-  
-  // Real-time system state track karne ke liye premium state controller
-  const [isSystemOnline, setIsSystemOnline] = useState(false);
+  const [isSystemOnline, setIsSystemOnline] = useState(true);
+
+  const menuItems = [
+    { key: "Home", label: "Explore & Routes", icon: <FaCompass /> },
+    { key: "Navigation", label: "DSA Engine Lab", icon: <FaRoute /> },
+    { key: "Nearby", label: "Nearby POIs", icon: <FaMapMarkerAlt /> },
+    { key: "Saved", label: "Saved Places", icon: <FaBookmark /> },
+    { key: "History", label: "Trip History", icon: <FaHistory /> },
+    { key: "Traffic", label: "Traffic Density", icon: <FaTrafficLight /> },
+    { key: "Settings", label: "Preferences", icon: <FaCog /> },
+    { key: "About", label: "System Specs", icon: <FaInfoCircle /> }
+  ];
 
   const handleSystemInitialization = () => {
     setIsSystemOnline(true);
-    // Custom trigger parameters dispatch loops taaki main modules responsive load ho sakein
-    const event = new CustomEvent('systemInitTriggered', { 
-      detail: { timestamp: new Date().toLocaleTimeString() } 
+    const event = new CustomEvent("systemInitTriggered", {
+      detail: { timestamp: new Date().toLocaleTimeString() }
     });
     window.dispatchEvent(event);
   };
 
   return (
     <aside className="apple-sidebar-container">
+      {/* Brand Header */}
       <div className="sidebar-brand-wrapper">
         <div className="brand-vector-icon">
           <div className="inner-pulse-core"></div>
         </div>
-        <h2>Maps Engine</h2>
+        <div className="brand-title-meta">
+          <h2>Maps Engine</h2>
+          <span>Google Navigation</span>
+        </div>
       </div>
 
+      {/* Navigation Links */}
       <nav className="sidebar-nav-list">
         {menuItems.map((item) => (
           <button
-            key={item}
-            className={`sidebar-nav-btn ${activeTab === item ? 'is-active-pill' : ''}`}
-            onClick={() => setActiveTab(item)}
+            key={item.key}
+            className={`sidebar-nav-btn ${activeTab === item.key ? "is-active-pill" : ""}`}
+            onClick={() => setActiveTab(item.key)}
           >
-            <span className="nav-bullet-indicator"></span>
-            <span className="nav-btn-text">{item}</span>
+            <span className="nav-menu-icon">{item.icon}</span>
+            <span className="nav-btn-text">{item.label}</span>
           </button>
         ))}
       </nav>
 
+      {/* Footer System Status Card */}
       <div className="sidebar-footer-cta">
-        <h4>Smart Guidance</h4>
-        <p>Advanced real-time DSA path optimization pipeline.</p>
-        
-        {/* Dynamic State Buttons Switch */}
-        <button 
-          className={`cta-action-trigger ${isSystemOnline ? 'system-active-glow' : ''}`}
+        <div className="cta-icon-badge">
+          <FaBolt />
+        </div>
+        <h4>DSA Core Active</h4>
+        <p>C++ Dijkstra & Live OSM Adjacency routing pipeline ready.</p>
+
+        <button
+          className={`cta-action-trigger ${isSystemOnline ? "system-active-glow" : ""}`}
           onClick={handleSystemInitialization}
-          disabled={isSystemOnline}
         >
-          {isSystemOnline ? '● System Online' : 'Initialize System'}
+          {isSystemOnline ? "● System Online" : "Initialize System"}
         </button>
       </div>
     </aside>

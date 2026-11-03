@@ -1,46 +1,102 @@
-// src/pages/History/HistoryPage.jsx
-import React from 'react';
-import './HistoryPage.css';
+// src/pages/HistoryPage.jsx
+import React from "react";
+import { useNavigation } from "../context/NavigationContext";
+import { FaHistory, FaRoute, FaTrash, FaCar, FaWalking, FaBicycle, FaBus } from "react-icons/fa";
+import "./HistoryPage.css";
 
-export default function HistoryPage() {
-  const transactionLogs = [
-    { id: 'TX-901', from: 'Patna, Bihar', to: 'Nalanda, Bihar', engine: 'Dijkstra', size: '88.4 KM', latency: '1 hr 45 min' },
-    { id: 'TX-902', from: 'Amity University Patna', to: 'Patna Junction', engine: 'A* Search', size: '12.5 KM', latency: '22 min' }
-  ];
+export default function HistoryPage({ setActiveTab }) {
+  const { history, clearHistory, calculateRoute, setSource, setDestination } = useNavigation();
+
+  const handleReRoute = (log) => {
+    setSource(log.from);
+    setDestination(log.to);
+    calculateRoute(log.from, log.to, log.mode || "driving");
+    if (setActiveTab) setActiveTab("Home");
+  };
+
+  const renderModeIcon = (mode) => {
+    switch (mode) {
+      case "walking":
+        return <FaWalking title="Walking" />;
+      case "cycling":
+        return <FaBicycle title="Cycling" />;
+      case "transit":
+        return <FaBus title="Transit" />;
+      default:
+        return <FaCar title="Driving" />;
+    }
+  };
 
   return (
     <div className="dynamic-subpage-view-wrapper fade-blur-entrance">
-      <div className="module-intro-meta">
-        <h1>Relational Database Route Logs</h1>
-        <p>Extracted spatial vectors historically computed inside your system environment layers.</p>
+      <div className="history-header-flex">
+        <div className="module-intro-meta">
+          <h1>Trip History & Recent Routes</h1>
+          <p>Review past calculated paths, distances, travel durations, and re-launch them with 1 click.</p>
+        </div>
+
+        {history.length > 0 && (
+          <button className="btn-clear-history" onClick={clearHistory}>
+            <FaTrash />
+            <span>Clear History</span>
+          </button>
+        )}
       </div>
 
-      <div className="table-viewport-frame">
-        <table className="enterprise-data-grid">
-          <thead>
-            <tr>
-              <th>Vector ID</th>
-              <th>Initial Node</th>
-              <th>Destination Point</th>
-              <th>DSA Instance</th>
-              <th>Distance Constraint</th>
-              <th>Traversal Cost</th>
-            </tr>
-          </thead>
-          <tbody>
-            {transactionLogs.map((log) => (
-              <tr key={log.id} className="data-row-item-interactive">
-                <td><code className="id-code-token">{log.id}</code></td>
-                <td><span className="node-text-weight">{log.from}</span></td>
-                <td><span className="node-text-weight">{log.to}</span></td>
-                <td><span className="algo-instance-pill">{log.engine}</span></td>
-                <td><strong>{log.size}</strong></td>
-                <td><span className="cost-metric-txt">{log.latency}</span></td>
+      {history.length === 0 ? (
+        <div className="empty-history-state">
+          <FaHistory className="empty-history-icon" />
+          <p>No recent trips found. Plan a route on the map to start building your history!</p>
+        </div>
+      ) : (
+        <div className="table-viewport-frame">
+          <table className="enterprise-data-grid">
+            <thead>
+              <tr>
+                <th>Date / Time</th>
+                <th>Mode</th>
+                <th>Origin</th>
+                <th>Destination</th>
+                <th>Distance</th>
+                <th>Duration</th>
+                <th>Action</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {history.map((log) => (
+                <tr key={log.id} className="data-row-item-interactive">
+                  <td>
+                    <span className="log-date-txt">{log.date}</span>
+                  </td>
+                  <td>
+                    <span className="log-mode-icon">{renderModeIcon(log.mode)}</span>
+                  </td>
+                  <td>
+                    <span className="node-text-weight">{log.from}</span>
+                  </td>
+                  <td>
+                    <span className="node-text-weight text-blue">{log.to}</span>
+                  </td>
+                  <td>
+                    <strong>{log.distance}</strong>
+                  </td>
+                  <td>
+                    <span className="cost-metric-txt">{log.duration}</span>
+                  </td>
+                  <td>
+                    <button
+                      className="btn-reroute-action"
+                      onClick={() => handleReRoute(log)}
+                    >
+                      <FaRoute /> Re-Route
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }

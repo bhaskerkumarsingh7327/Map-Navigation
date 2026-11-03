@@ -1,211 +1,253 @@
-/* .navbar{
+/* src/components/Navbar/Navbar.css */
 
-height:78px;
-
-display:flex;
-
-justify-content:space-between;
-
-align-items:center;
-
-padding:0 30px;
-
-background:rgba(255,255,255,.94);
-
-backdrop-filter:blur(18px);
-
-border-bottom:1px solid #e2e8f0;
-
-box-shadow:0 6px 20px rgba(0,0,0,.04);
-
-z-index:2000;
-
-}
-
-.navbar-logo{
-
-display:flex;
-
-align-items:center;
-
-gap:15px;
-
-}
-
-.logo-icon{
-
-font-size:34px;
-
-color:#2563eb;
-
-}
-
-.navbar-logo h2{
-
-font-size:22px;
-
-color:#1e293b;
-
-}
-
-.navbar-logo span{
-
-font-size:12px;
-
-color:#94a3b8;
-
-}
-
-.navbar-search{
-
-width:460px;
-
-height:50px;
-
-display:flex;
-
-align-items:center;
-
-gap:12px;
-
-padding:0 18px;
-
-background:#f8fafc;
-
-border:1px solid #e2e8f0;
-
-border-radius:16px;
-
-transition:.35s;
-
-}
-
-.navbar-search:focus-within{
-
-border-color:#2563eb;
-
-box-shadow:0 0 0 4px rgba(37,99,235,.08);
-
-}
-
-.search-icon{
-
-color:#94a3b8;
-
-}
-
-.navbar-search input{
-
-flex:1;
-
-border:none;
-
-outline:none;
-
-background:transparent;
-
-font-size:15px;
-
-}
-
-.navbar-right{
-
-display:flex;
-
-gap:12px;
-
-}
-
-.navbar-right button{
-
-width:48px;
-
-height:48px;
-
-border:none;
-
-border-radius:15px;
-
-background:#f8fafc;
-
-cursor:pointer;
-
-display:flex;
-
-justify-content:center;
-
-align-items:center;
-
-font-size:18px;
-
-transition:.3s;
-
-}
-
-.navbar-right button:hover{
-
-background:#2563eb;
-
-color:white;
-
-transform:translateY(-2px);
-
-}
-
-.profile-btn{
-
-font-size:25px !important;
-
-} */
- .global-navbar {
-  height: 70px;
+.global-navbar {
+  height: 68px;
   background: #ffffff;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid #e8eaed;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 24px;
-  width: 100%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  z-index: 600;
+  flex-shrink: 0;
 }
 
-.nav-input-node {
-  width: 460px;
-  padding: 10px 20px;
-  border-radius: 24px;
-  border: 1px solid #e2e8f0;
-  background: #f1f5f9;
-  outline: none;
-  font-size: 13px;
-  transition: border-color 0.2s;
-}
-
-.nav-input-node:focus {
-  border-color: #3b82f6;
-  background: #ffffff;
-}
-
-.navbar-user-controls {
+/* Brand Section */
+.navbar-brand-section {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 14px;
 }
 
-.btn-theme-switch {
-  padding: 8px 16px;
-  border-radius: 20px;
-  border: 1px solid #cbd5e1;
-  background: #ffffff;
-  cursor: pointer;
-  font-size: 12px;
+.navbar-logo-badge {
+  width: 40px;
+  height: 40px;
+  background: #e8f0fe;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brand-logo-icon {
+  font-size: 22px;
+  color: #1a73e8;
+}
+
+.navbar-brand-text h2 {
+  font-size: 17px;
+  font-weight: 700;
+  color: #202124;
+  margin: 0;
+  letter-spacing: -0.2px;
+}
+
+.engine-status-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: #5f6368;
   font-weight: 500;
 }
 
-.user-profile-meta {
+.status-live-dot {
+  font-size: 7px;
+  color: #0f9d58; /* Green pulsing dot */
+  animation: pulseDot 1.5s infinite;
+}
+
+/* Global Search Bar */
+.navbar-global-search {
+  position: relative;
+  width: 440px;
+  max-width: 40%;
+  display: flex;
+  align-items: center;
+  background: #f1f3f4;
+  border: 1px solid transparent;
+  border-radius: 24px;
+  padding: 0 16px;
+  height: 44px;
+  transition: all 0.2s ease;
+}
+
+.navbar-global-search:focus-within {
+  background: #ffffff;
+  border-color: #1a73e8;
+  box-shadow: 0 1px 6px rgba(32, 33, 36, 0.28);
+}
+
+.global-search-icon {
+  color: #5f6368;
+  font-size: 15px;
+  margin-right: 10px;
+}
+
+.navbar-global-search input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 14px;
+  color: #202124;
+  font-family: inherit;
+  font-weight: 500;
+}
+
+.navbar-clear-btn {
+  background: none;
+  border: none;
+  color: #70757a;
+  cursor: pointer;
+  padding: 4px;
+}
+
+/* Dropdown */
+.navbar-search-dropdown {
+  position: absolute;
+  top: 48px;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+  border: 1px solid #dadce0;
+  max-height: 260px;
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+.navbar-dropdown-row {
+  padding: 10px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid #f1f3f4;
+  display: flex;
+  flex-direction: column;
+}
+
+.navbar-dropdown-row:last-child {
+  border-bottom: none;
+}
+
+.navbar-dropdown-row:hover {
+  background: #f8f9fa;
+}
+
+.navbar-dropdown-row strong {
+  font-size: 13px;
+  color: #202124;
+}
+
+.navbar-dropdown-row span {
+  font-size: 11px;
+  color: #5f6368;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Right Controls */
+.navbar-right-controls {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.navbar-time-chip {
+  background: #f1f3f4;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #3c4043;
+}
+
+.btn-theme-switch-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 20px;
+  border: 1px solid #dadce0;
+  background: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  color: #3c4043;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-theme-switch-toggle:hover {
+  background: #f8f9fa;
+  border-color: #c6c6c6;
+}
+
+.theme-sun-icon {
+  color: #fbbc04;
+}
+
+.user-profile-meta-chip {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-weight: 600;
+  padding: 6px 12px;
+  background: #f8f9fa;
+  border-radius: 20px;
+  border: 1px solid #e8eaed;
+}
+
+.user-avatar-icon {
+  font-size: 22px;
+  color: #1a73e8;
+}
+
+.user-display-name {
   font-size: 13px;
-  color: #1e293b;
-  cursor: pointer;
+  font-weight: 600;
+  color: #202124;
+}
+
+/* Dark mode theme root styles */
+body.dark-mode-theme {
+  background-color: #121212 !important;
+  color: #e8eaed !important;
+}
+
+body.dark-mode-theme .global-navbar,
+body.dark-mode-theme .apple-sidebar-container,
+body.dark-mode-theme .directions-input-card,
+body.dark-mode-theme .travel-modes-bar,
+body.dark-mode-theme .panel-summary-card,
+body.dark-mode-theme .turn-by-turn-accordion-container,
+body.dark-mode-theme .alt-routes-selector-box,
+body.dark-mode-theme .metric-box,
+body.dark-mode-theme .google-floating-controls,
+body.dark-mode-theme .google-layers-picker-card,
+body.dark-mode-theme .dashboard-widget-card-node,
+body.dark-mode-theme .dynamic-subpage-view-wrapper {
+  background: #1e1e1e !important;
+  color: #e8eaed !important;
+  border-color: #333333 !important;
+}
+
+body.dark-mode-theme input,
+body.dark-mode-theme select {
+  background: #2a2a2a !important;
+  color: #ffffff !important;
+  border-color: #444444 !important;
+}
+
+body.dark-mode-theme strong,
+body.dark-mode-theme h1,
+body.dark-mode-theme h2,
+body.dark-mode-theme h3,
+body.dark-mode-theme h4 {
+  color: #ffffff !important;
+}
+
+body.dark-mode-theme .input-field-core,
+body.dark-mode-theme .navbar-global-search {
+  background: #2d2d2d !important;
 }

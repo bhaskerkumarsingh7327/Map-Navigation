@@ -1,0 +1,25 @@
+{
+  "name": "google-navigation-simulator",
+  "version": "2.0.0",
+  "description": "Google Maps Navigation Simulator with C++ Dijkstra Graph Engine, Real-time Turn-by-Turn GPS Navigation & OSM Routing",
+  "scripts": {
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev:backend": "npm --prefix backend run dev",
+    "build:cpp": "cd backend/algorithms && clang++ -std=c++17 main.cpp dijkstra.cpp graph.cpp -o graph",
+    "build:frontend": "npm --prefix frontend run build",
+    "build": "npm run build:cpp && npm run build:frontend",
+    "start": "npm run dev:frontend"
+  },
+  "keywords": [
+    "google-maps",
+    "navigation",
+    "dijkstra",
+    "dsa",
+    "leaflet",
+    "react",
+    "express"
+  ],
+  "author": "Bhasker Kumar Singh",
+  "license": "ISC"
+}
+

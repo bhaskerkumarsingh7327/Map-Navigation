@@ -1,16 +1,196 @@
-/* src/pages/Nearby/NearbyPage.css */
-.pill-scroll-track { display: flex; gap: 12px; flex-wrap: wrap; }
-.enterprise-filter-pill-node { background: #f2f2f7; border: none; padding: 10px 20px; border-radius: 20px; font-size: 13px; font-weight: 600; color: #636366; cursor: pointer; transition: all 0.25s; }
-.enterprise-filter-pill-node:hover { background: #e5e5ea; }
-.enterprise-filter-pill-node.pill-is-selected { background: #007aff; color: #ffffff; }
+/* src/pages/NearbyPage.css */
 
-.poi-cards-layout-matrix { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
-.poi-native-card-cell { background: #f2f2f7; border-radius: 18px; padding: 20px; display: flex; flex-direction: column; gap: 14px; transition: all 0.2s; }
-.poi-native-card-cell:hover { background: #ffffff; border: 1px solid #e5e5ea; box-shadow: 0 10px 20px rgba(0,0,0,0.02); }
+.dynamic-subpage-view-wrapper {
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 30px;
+  height: 100%;
+  overflow-y: auto;
+  border: 1px solid #e8eaed;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+}
 
-.poi-cell-top-flex { display: flex; justify-content: space-between; align-items: center; }
-.poi-cell-top-flex h4 { font-size: 16px; font-weight: 700; color: #1c1c1e; }
-.poi-active-status-tag { font-size: 11px; font-weight: 700; background: #ffffff; padding: 4px 10px; border-radius: 8px; color: #30d158; border: 1px solid #e5e5ea; }
+.module-intro-meta h1 {
+  font-size: 24px;
+  font-weight: 800;
+  color: #202124;
+  margin: 0 0 6px;
+}
 
-.poi-cell-bottom-flex { display: flex; justify-content: space-between; font-size: 13px; align-items: center; }
-.poi-type-label-text { color: #8e8e93; font-weight: 600; }
+.module-intro-meta p {
+  font-size: 14px;
+  color: #5f6368;
+  margin: 0 0 20px;
+}
+
+.nearby-controls-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.nearby-search-field {
+  display: flex;
+  align-items: center;
+  background: #f1f3f4;
+  border-radius: 24px;
+  padding: 0 16px;
+  height: 44px;
+  width: 100%;
+  max-width: 450px;
+}
+
+.nearby-search-icon {
+  color: #5f6368;
+  margin-right: 10px;
+}
+
+.nearby-search-field input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 14px;
+  color: #202124;
+  font-family: inherit;
+}
+
+.pill-scroll-track {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.enterprise-filter-pill-node {
+  background: #f1f3f4;
+  border: 1px solid #dadce0;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #3c4043;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.enterprise-filter-pill-node:hover {
+  background: #e8eaed;
+}
+
+.enterprise-filter-pill-node.pill-is-selected {
+  background: #1a73e8;
+  color: #ffffff;
+  border-color: #1a73e8;
+}
+
+.poi-cards-layout-matrix {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 18px;
+}
+
+.poi-native-card-cell {
+  background: #ffffff;
+  border: 1px solid #e8eaed;
+  border-radius: 18px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.poi-native-card-cell:hover {
+  transform: translateY(-2px);
+  border-color: #1a73e8;
+  box-shadow: 0 8px 24px rgba(26, 115, 232, 0.1);
+}
+
+.poi-cell-top-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.poi-cell-top-flex h4 {
+  font-size: 15px;
+  font-weight: 700;
+  color: #202124;
+  margin: 0;
+}
+
+.poi-active-status-tag {
+  font-size: 11px;
+  font-weight: 700;
+  background: #e6f4ea;
+  padding: 3px 8px;
+  border-radius: 6px;
+  color: #137333;
+}
+
+.poi-rating-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.star-yellow {
+  color: #fbbc04;
+}
+
+.poi-cat-chip {
+  font-size: 11px;
+  color: #5f6368;
+  background: #f1f3f4;
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-left: 6px;
+}
+
+.poi-address-txt {
+  font-size: 12px;
+  color: #5f6368;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.poi-cell-bottom-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 6px;
+  padding-top: 10px;
+  border-top: 1px solid #f1f3f4;
+}
+
+.poi-distance-badge {
+  font-size: 12px;
+  font-weight: 600;
+  color: #1a73e8;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-poi-navigate {
+  background: #1a73e8;
+  color: #ffffff;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.btn-poi-navigate:hover {
+  background: #1557b0;
+}
