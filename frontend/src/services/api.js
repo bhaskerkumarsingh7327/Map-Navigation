@@ -1,7 +1,7 @@
 // src/services/api.js
 // Universal Google Maps API service with local backend + live OSM/OSRM support
 
-const BACKEND_API = "http://localhost:3000/api";
+const BACKEND_API = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000/api";
 
 // Built-in Indian & Bihar locations for instant offline search & quick selection
 export const PREDEFINED_LOCATIONS = [
