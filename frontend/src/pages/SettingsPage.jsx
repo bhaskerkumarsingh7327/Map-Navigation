@@ -95,7 +95,7 @@ export default function SettingsPage() {
             >
               <option value="standard">Google Clean Street</option>
               <option value="satellite">Satellite / Hybrid</option>
-              <option value="dark">Carto Dark Matter (Night)</option>
+              <option value="dark">Google Night Mode (Dark)</option>
               <option value="terrain">OpenTopoMap (Terrain)</option>
             </select>
           </div>

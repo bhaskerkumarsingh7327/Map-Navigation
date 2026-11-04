@@ -287,8 +287,8 @@ export default function MapView() {
         };
       case "dark":
         return {
-          url: "https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
-          attribution: "&copy; OpenStreetMap contributors &copy; CARTO"
+          url: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+          attribution: "&copy; OpenStreetMap contributors (Google Maps Night Mode)"
         };
       case "terrain":
         return {
@@ -343,7 +343,7 @@ export default function MapView() {
   };
 
   return (
-    <div className="google-map-root-wrapper">
+    <div className={`google-map-root-wrapper ${mapTheme === "dark" ? "map-theme-dark" : ""}`}>
       {/* Google Maps gesture notice when scrolling without Cmd/Ctrl */}
       {showZoomHint && (
         <div className="google-maps-gesture-hint">
