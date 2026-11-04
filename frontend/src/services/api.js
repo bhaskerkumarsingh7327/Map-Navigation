@@ -467,8 +467,8 @@ export async function getLiveWeather(lat = 25.6110, lng = 85.1440) {
   };
 }
 
-// Distance helper
-function calculateEuclideanDistance([lat1, lon1], [lat2, lon2]) {
+// Distance helper (KM)
+export function calculateEuclideanDistance([lat1, lon1], [lat2, lon2]) {
   const R = 6371;
   const dLat = (lat2 - lat1) * (Math.PI / 180);
   const dLon = (lon2 - lon1) * (Math.PI / 180);

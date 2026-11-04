@@ -159,24 +159,33 @@ function MapEventsHandler({ onMapClick }) {
 // Controller to auto fit bounds or center map
 function MapBoundsController({ coordinates, isNavigating, navLocation }) {
   const map = useMap();
+  const hasNavFlownRef = useRef(false);
 
   useEffect(() => {
-    if (isNavigating && navLocation) {
-      map.setView(navLocation, 16, { animate: true, duration: 0.8 });
+    if (!isNavigating) {
+      hasNavFlownRef.current = false;
+      if (coordinates && coordinates.length > 1) {
+        try {
+          const bounds = L.latLngBounds(coordinates);
+          map.fitBounds(bounds, {
+            padding: [80, 80],
+            maxZoom: 15,
+            animate: true
+          });
+        } catch (e) {}
+      } else if (coordinates && coordinates.length === 1) {
+        map.setView(coordinates[0], 13, { animate: true });
+      }
       return;
     }
 
-    if (coordinates && coordinates.length > 1) {
-      try {
-        const bounds = L.latLngBounds(coordinates);
-        map.fitBounds(bounds, {
-          padding: [80, 80],
-          maxZoom: 15,
-          animate: true
-        });
-      } catch (e) {}
-    } else if (coordinates && coordinates.length === 1) {
-      map.setView(coordinates[0], 13, { animate: true });
+    if (isNavigating && navLocation) {
+      if (!hasNavFlownRef.current) {
+        hasNavFlownRef.current = true;
+        map.flyTo(navLocation, 15, { animate: true, duration: 1.2 });
+      } else {
+        map.panTo(navLocation, { animate: true, duration: 0.3 });
+      }
     }
   }, [coordinates, isNavigating, navLocation, map]);
 

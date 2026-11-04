@@ -88,10 +88,15 @@ export const NavigationProvider = ({ children }) => {
 
   // 4. Live GPS Turn-by-Turn Navigation Simulation States
   const [isNavigating, setIsNavigating] = useState(false);
+  const [isNavPaused, setIsNavPaused] = useState(false);
+  const [navSpeedMultiplier, setNavSpeedMultiplier] = useState(1); // 1x, 2x, 4x
+  const isNavPausedRef = useRef(false);
+  const navSpeedMultiplierRef = useRef(1);
+
   const [navigationProgress, setNavigationProgress] = useState({
     currentStepIndex: 0,
     currentCoordIndex: 0,
-    speed: 48,
+    speed: 0,
     remainingDistance: "88.4 KM",
     remainingTime: "1 hr 45 min",
     currentLocation: [25.6110, 85.1440],
@@ -100,6 +105,14 @@ export const NavigationProvider = ({ children }) => {
   });
   const [isMuted, setIsMuted] = useState(false);
   const navigationTimerRef = useRef(null);
+
+  useEffect(() => {
+    isNavPausedRef.current = isNavPaused;
+  }, [isNavPaused]);
+
+  useEffect(() => {
+    navSpeedMultiplierRef.current = navSpeedMultiplier;
+  }, [navSpeedMultiplier]);
 
   // 5. Map Styling & UI Options
   const [mapTheme, setMapTheme] = useState("standard"); // standard, satellite, dark, terrain
@@ -316,32 +329,100 @@ export const NavigationProvider = ({ children }) => {
     );
   };
 
+  // Helper to interpolate dense micro-steps so vehicle moves smoothly without jumping
+  const interpolateDensePath = (coords, stepMeters = 20) => {
+    if (!coords || coords.length < 2) return coords || [];
+    const finePoints = [];
+
+    for (let i = 0; i < coords.length - 1; i++) {
+      const p1 = coords[i];
+      const p2 = coords[i + 1];
+      const dLat = (p2[0] - p1[0]) * 111320;
+      const dLng = (p2[1] - p1[1]) * 111320 * Math.cos((p1[0] * Math.PI) / 180);
+      const distMeters = Math.hypot(dLat, dLng);
+      const stepsCount = Math.max(1, Math.ceil(distMeters / stepMeters));
+
+      for (let s = 0; s < stepsCount; s++) {
+        const t = s / stepsCount;
+        finePoints.push([
+          p1[0] + (p2[0] - p1[0]) * t,
+          p1[1] + (p2[1] - p1[1]) * t
+        ]);
+      }
+    }
+    finePoints.push(coords[coords.length - 1]);
+    return finePoints;
+  };
+
+  // Toggle Pause/Resume during navigation
+  const togglePauseNavigation = () => {
+    setIsNavPaused(prev => !prev);
+  };
+
+  // Cycle simulation speed (1x -> 2x -> 4x -> 1x)
+  const cycleNavSpeed = () => {
+    setNavSpeedMultiplier(prev => {
+      if (prev === 1) return 2;
+      if (prev === 2) return 4;
+      return 1;
+    });
+  };
+
   // Start Real-Time Turn-by-Turn Navigation Simulation
   const startNavigation = () => {
     if (!routeCoordinates || routeCoordinates.length === 0) return;
 
+    // Create a dense, micro-step path so the vehicle glides smoothly without jumping kilometers
+    const densePath = interpolateDensePath(routeCoordinates, 20);
+
     setIsNavigating(true);
+    setIsNavPaused(false);
+    isNavPausedRef.current = false;
+
     const firstStepText = steps.length > 0 ? steps[0].instruction : "Proceed along highlighted route";
     speakInstruction(`Starting navigation to ${destination}. ${firstStepText}`);
 
     let coordIdx = 0;
     let stepIdx = 0;
+    let currentSpeed = 0;
+    const cruiseSpeed = 38; // Normal realistic cruising speed (km/h)
 
     if (navigationTimerRef.current) clearInterval(navigationTimerRef.current);
 
+    // Initial state: Speed starts at 0 km/h (no sudden speed surge)
+    setNavigationProgress({
+      currentStepIndex: 0,
+      currentCoordIndex: 0,
+      speed: 0,
+      remainingDistance: routeInfo.distance || "88 KM",
+      remainingTime: routeInfo.estimatedTime || "1 hr 45 min",
+      currentLocation: densePath[0],
+      bearing: 90,
+      nextManeuver: steps[0]?.instruction || "Head ahead"
+    });
+
     navigationTimerRef.current = setInterval(() => {
-      coordIdx++;
-      if (coordIdx >= routeCoordinates.length) {
-        clearInterval(navigationTimerRef.current);
-        speakInstruction("You have reached your destination.");
-        setIsNavigating(false);
+      // If user paused navigation, hold position and speed 0
+      if (isNavPausedRef.current) {
+        setNavigationProgress(prev => ({ ...prev, speed: 0 }));
         return;
       }
 
-      const currentPos = routeCoordinates[coordIdx];
-      const prevPos = routeCoordinates[coordIdx - 1];
+      const multiplier = navSpeedMultiplierRef.current || 1;
+      coordIdx += multiplier;
 
-      // Calculate bearing angle for car icon rotation
+      if (coordIdx >= densePath.length) {
+        clearInterval(navigationTimerRef.current);
+        speakInstruction("You have reached your destination.");
+        setIsNavigating(false);
+        setIsNavPaused(false);
+        return;
+      }
+
+      const currentPos = densePath[coordIdx];
+      const prevPos = densePath[Math.max(0, coordIdx - 1)];
+
+      // Calculate bearing angle for smooth vehicle marker rotation
       const dLon = (currentPos[1] - prevPos[1]) * (Math.PI / 180);
       const lat1 = prevPos[0] * (Math.PI / 180);
       const lat2 = currentPos[0] * (Math.PI / 180);
@@ -349,15 +430,24 @@ export const NavigationProvider = ({ children }) => {
       const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLon);
       const bearing = (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
 
-      // Progress percentages
-      const fraction = coordIdx / routeCoordinates.length;
-      const remainingKm = ((routeInfo.distanceValue || 88) * (1 - fraction)).toFixed(1);
-      const remainingMins = Math.max(1, Math.round((routeInfo.travelTimeMinutes || 105) * (1 - fraction)));
+      // Smooth acceleration: speed gently rises from 0 -> cruiseSpeed
+      if (currentSpeed < cruiseSpeed) {
+        currentSpeed = Math.min(cruiseSpeed, currentSpeed + 3);
+      } else {
+        currentSpeed = cruiseSpeed + Math.sin(coordIdx * 0.1) * 2;
+      }
+
+      // Progress calculation
+      const fraction = coordIdx / densePath.length;
+      const totalKm = routeInfo.distanceValue || 88;
+      const remainingKm = Math.max(0, (totalKm * (1 - fraction))).toFixed(1);
+      const totalMins = routeInfo.travelTimeMinutes || 105;
+      const remainingMins = Math.max(1, Math.round(totalMins * (1 - fraction)));
       const hours = Math.floor(remainingMins / 60);
       const mins = remainingMins % 60;
       const remainingTime = hours > 0 ? `${hours} hr ${mins} min` : `${mins} min`;
 
-      // Next step logic
+      // Next step cue
       const targetStepIdx = Math.min(
         steps.length - 1,
         Math.floor(fraction * steps.length)
@@ -365,26 +455,27 @@ export const NavigationProvider = ({ children }) => {
       if (targetStepIdx !== stepIdx) {
         stepIdx = targetStepIdx;
         if (steps[stepIdx]) {
-          speakInstruction(`In 300 meters, ${steps[stepIdx].instruction}`);
+          speakInstruction(`In 200 meters, ${steps[stepIdx].instruction}`);
         }
       }
 
       setNavigationProgress({
         currentStepIndex: stepIdx,
         currentCoordIndex: coordIdx,
-        speed: Math.floor(40 + Math.random() * 15),
+        speed: Math.round(currentSpeed * multiplier),
         remainingDistance: `${remainingKm} KM`,
         remainingTime,
         currentLocation: currentPos,
         bearing,
         nextManeuver: steps[stepIdx] ? steps[stepIdx].instruction : "Continue on route"
       });
-    }, 1200);
+    }, 280);
   };
 
   const stopNavigation = () => {
     if (navigationTimerRef.current) clearInterval(navigationTimerRef.current);
     setIsNavigating(false);
+    setIsNavPaused(false);
     if (window.speechSynthesis) window.speechSynthesis.cancel();
   };
 
@@ -448,6 +539,10 @@ export const NavigationProvider = ({ children }) => {
         activeRouteIndex,
         selectAlternativeRoute,
         isNavigating,
+        isNavPaused,
+        togglePauseNavigation,
+        navSpeedMultiplier,
+        cycleNavSpeed,
         navigationProgress,
         startNavigation,
         stopNavigation,

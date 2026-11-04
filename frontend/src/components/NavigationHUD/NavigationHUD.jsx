@@ -10,13 +10,19 @@ import {
   FaVolumeMute,
   FaTimes,
   FaCrosshairs,
-  FaMapMarkerAlt
+  FaMapMarkerAlt,
+  FaPlay,
+  FaPause
 } from "react-icons/fa";
 import "./NavigationHUD.css";
 
 export default function NavigationHUD() {
   const {
     isNavigating,
+    isNavPaused,
+    togglePauseNavigation,
+    navSpeedMultiplier,
+    cycleNavSpeed,
     stopNavigation,
     navigationProgress,
     routeInfo,
@@ -67,6 +73,25 @@ export default function NavigationHUD() {
 
       {/* 2. Floating Action Controls (Right side) */}
       <div className="hud-floating-side-tools">
+        {/* Pause / Play simulation toggle */}
+        <button
+          className={`hud-side-btn ${isNavPaused ? "btn-is-paused" : ""}`}
+          onClick={togglePauseNavigation}
+          title={isNavPaused ? "Resume Navigation (Play)" : "Pause Navigation"}
+        >
+          {isNavPaused ? <FaPlay /> : <FaPause />}
+        </button>
+
+        {/* Speed multiplier toggle */}
+        <button
+          className="hud-speed-pill-btn"
+          onClick={cycleNavSpeed}
+          title="Click to toggle simulation speed (1x, 2x, 4x)"
+        >
+          ⚡ {navSpeedMultiplier}x
+        </button>
+
+        {/* Mute toggle */}
         <button
           className={`hud-side-btn ${isMuted ? "btn-is-muted" : ""}`}
           onClick={() => setIsMuted(!isMuted)}
@@ -75,6 +100,7 @@ export default function NavigationHUD() {
           {isMuted ? <FaVolumeMute /> : <FaVolumeUp />}
         </button>
 
+        {/* Recenter camera */}
         <button
           className="hud-side-btn"
           onClick={handleRecenter}
@@ -83,6 +109,7 @@ export default function NavigationHUD() {
           <FaCrosshairs />
         </button>
 
+        {/* Live Speedometer */}
         <div className="hud-speedometer-badge">
           <strong>{speed}</strong>
           <span>km/h</span>

@@ -127,6 +127,32 @@
   background: #fce8e6;
 }
 
+.hud-side-btn.btn-is-paused {
+  color: #f2994a;
+  background: #fff8e1;
+}
+
+.hud-speed-pill-btn {
+  background: #ffffff;
+  color: #1a73e8;
+  font-weight: 700;
+  font-size: 13px;
+  border: 1.5px solid #dadce0;
+  border-radius: 20px;
+  padding: 6px 12px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.hud-speed-pill-btn:hover {
+  background: #e8f0fe;
+  border-color: #1a73e8;
+}
+
 .hud-speedometer-badge {
   background: #ffffff;
   border-radius: 12px;
