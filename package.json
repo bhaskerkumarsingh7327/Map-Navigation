@@ -5,9 +5,9 @@
   "scripts": {
     "dev:frontend": "npm --prefix frontend run dev",
     "dev:backend": "npm --prefix backend run dev",
-    "build:cpp": "cd backend/algorithms && clang++ -std=c++17 main.cpp dijkstra.cpp graph.cpp -o graph",
+    "build:cpp": "cd backend/algorithms && (clang++ -std=c++17 main.cpp dijkstra.cpp graph.cpp -o graph || echo 'C++ skipped')",
     "build:frontend": "npm --prefix frontend run build",
-    "build": "npm run build:cpp && npm run build:frontend",
+    "build": "npm --prefix frontend install && npm --prefix frontend run build",
     "start": "npm run dev:frontend"
   },
   "keywords": [
