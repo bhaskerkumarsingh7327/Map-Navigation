@@ -17,7 +17,8 @@ import {
   FaArrowUp,
   FaRedo,
   FaMapMarkerAlt,
-  FaCheck
+  FaCheck,
+  FaLocationArrow
 } from "react-icons/fa";
 import "./RoutePanel.css";
 
@@ -32,6 +33,7 @@ export default function RoutePanel() {
     selectAlternativeRoute,
     startNavigation,
     isNavigating,
+    navMode,
     savePlace,
     setIsRoutePanelOpen
   } = useNavigation();
@@ -102,14 +104,26 @@ export default function RoutePanel() {
           <span className="meta-road-type">{routeInfo.roadType}</span>
         </div>
 
-        {/* 2. Main Google "Start" Navigation Action Button */}
-        <button
-          className={`btn-start-navigation ${isNavigating ? "is-active-nav" : ""}`}
-          onClick={startNavigation}
-        >
-          <FaPlay className="play-icon-tri" />
-          <span>{isNavigating ? "Navigation in Progress" : "Start Navigation"}</span>
-        </button>
+        {/* 2. Start Navigation: Live Device GPS vs Virtual Preview */}
+        <div className="nav-action-buttons-group">
+          <button
+            className={`btn-start-navigation ${isNavigating && navMode === "live" ? "is-active-nav" : ""}`}
+            onClick={() => startNavigation("live")}
+            title="Real Car Driving Mode: Car ONLY moves when you physically drive in the real world!"
+          >
+            <FaLocationArrow className="play-icon-tri" />
+            <span>{isNavigating && navMode === "live" ? "Live GPS Active" : "Start Live GPS"}</span>
+          </button>
+
+          <button
+            className={`btn-start-simulation ${isNavigating && navMode === "demo" ? "is-active-demo" : ""}`}
+            onClick={() => startNavigation("demo")}
+            title="Demo Simulation Mode: Auto-drives route to preview turns on laptop"
+          >
+            <FaPlay style={{ fontSize: "11px" }} />
+            <span>{isNavigating && navMode === "demo" ? "Simulating" : "Demo Preview"}</span>
+          </button>
+        </div>
 
         {/* 3. Quick Actions: Save & Share */}
         <div className="route-quick-actions-row">

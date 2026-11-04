@@ -86,12 +86,14 @@ export const NavigationProvider = ({ children }) => {
   const [isDirectionsOpen, setIsDirectionsOpen] = useState(true);
   const [isRoutePanelOpen, setIsRoutePanelOpen] = useState(true);
 
-  // 4. Live GPS Turn-by-Turn Navigation Simulation States
+  // 4. Live GPS Turn-by-Turn Navigation States (Real Device GPS & Demo Simulation)
   const [isNavigating, setIsNavigating] = useState(false);
+  const [navMode, setNavMode] = useState("live"); // 'live' = Real Physical GPS Driving, 'demo' = Virtual Simulation
   const [isNavPaused, setIsNavPaused] = useState(false);
   const [navSpeedMultiplier, setNavSpeedMultiplier] = useState(1); // 1x, 2x, 4x
   const isNavPausedRef = useRef(false);
   const navSpeedMultiplierRef = useRef(1);
+  const watchIdRef = useRef(null);
 
   const [navigationProgress, setNavigationProgress] = useState({
     currentStepIndex: 0,
@@ -368,28 +370,122 @@ export const NavigationProvider = ({ children }) => {
     });
   };
 
-  // Start Real-Time Turn-by-Turn Navigation Simulation
-  const startNavigation = () => {
+  // Start Navigation: Supports 'live' (Real Device GPS Movement) and 'demo' (Virtual Simulation Drive)
+  const startNavigation = (chosenMode = navMode) => {
     if (!routeCoordinates || routeCoordinates.length === 0) return;
 
-    // Create a dense, micro-step path so the vehicle glides smoothly without jumping kilometers
-    const densePath = interpolateDensePath(routeCoordinates, 20);
+    // Reset previous timers / GPS watches
+    if (navigationTimerRef.current) clearInterval(navigationTimerRef.current);
+    if (watchIdRef.current && navigator.geolocation) {
+      navigator.geolocation.clearWatch(watchIdRef.current);
+      watchIdRef.current = null;
+    }
 
     setIsNavigating(true);
     setIsNavPaused(false);
     isNavPausedRef.current = false;
+    setNavMode(chosenMode);
 
     const firstStepText = steps.length > 0 ? steps[0].instruction : "Proceed along highlighted route";
     speakInstruction(`Starting navigation to ${destination}. ${firstStepText}`);
 
+    // ========================================================
+    // 1. REAL PHYSICAL GPS MODE (Jab Aap Asli Gaadi Me Honge)
+    // ========================================================
+    if (chosenMode === "live") {
+      // In Live GPS Mode: Gaadi apne aap bilkul NAHI chalegi!
+      // Jab tak aapki physical car/phone nahi chalegi, speed = 0 km/h rahegi aur gaadi wahi ruki rahegi!
+      const initialPos = sourceCoords || routeCoordinates[0];
+
+      setNavigationProgress({
+        currentStepIndex: 0,
+        currentCoordIndex: 0,
+        speed: 0, // Parked / Stopped initially
+        remainingDistance: routeInfo.distance || "88 KM",
+        remainingTime: routeInfo.estimatedTime || "1 hr 45 min",
+        currentLocation: initialPos,
+        bearing: 0,
+        nextManeuver: steps[0]?.instruction || "Head towards route"
+      });
+
+      if (navigator.geolocation) {
+        watchIdRef.current = navigator.geolocation.watchPosition(
+          (pos) => {
+            const { latitude, longitude, speed: rawSpeed, heading } = pos.coords;
+            const currentPos = [latitude, longitude];
+
+            // Real physical GPS speed in km/h (0 when vehicle is stopped!)
+            const realSpeed = (rawSpeed !== null && rawSpeed > 0) ? Math.round(rawSpeed * 3.6) : 0;
+
+            // Real distance to destination
+            const destCoord = destinationCoords || routeCoordinates[routeCoordinates.length - 1];
+            const distToDestKm = calculateEuclideanDistance(currentPos, destCoord).toFixed(1);
+
+            // Time estimate based on real speed
+            const speedToUse = realSpeed > 5 ? realSpeed : 35;
+            const minsLeft = Math.max(1, Math.round((parseFloat(distToDestKm) / speedToUse) * 60));
+            const hours = Math.floor(minsLeft / 60);
+            const mins = minsLeft % 60;
+            const remainingTimeStr = hours > 0 ? `${hours} hr ${mins} min` : `${mins} min`;
+
+            // Detect closest step
+            let closestStep = steps[0];
+            let minStepDist = Infinity;
+            steps.forEach((step) => {
+              if (step.location) {
+                const d = calculateEuclideanDistance(currentPos, step.location);
+                if (d < minStepDist) {
+                  minStepDist = d;
+                  closestStep = step;
+                }
+              }
+            });
+
+            // Voice guidance when approaching turn within 200m
+            if (minStepDist < 0.2 && closestStep) {
+              speakInstruction(`In 200 meters, ${closestStep.instruction}`);
+            }
+
+            // Destination reached check (within 50 meters)
+            if (parseFloat(distToDestKm) < 0.05) {
+              speakInstruction("You have arrived at your destination.");
+              stopNavigation();
+              return;
+            }
+
+            setNavigationProgress({
+              currentStepIndex: closestStep?.id || 0,
+              currentCoordIndex: 0,
+              speed: realSpeed, // 0 km/h when stopped at red light!
+              remainingDistance: `${distToDestKm} KM`,
+              remainingTime: remainingTimeStr,
+              currentLocation: currentPos,
+              bearing: heading || 0,
+              nextManeuver: closestStep?.instruction || "Continue on route"
+            });
+          },
+          (err) => {
+            console.warn("Live GPS watchPosition error:", err.message);
+          },
+          {
+            enableHighAccuracy: true,
+            maximumAge: 1000,
+            timeout: 10000
+          }
+        );
+      }
+      return;
+    }
+
+    // ========================================================
+    // 2. DEMO / SIMULATION MODE (Ghar Baithe Route Preview Dekhne Ke Liye)
+    // ========================================================
+    const densePath = interpolateDensePath(routeCoordinates, 20);
     let coordIdx = 0;
     let stepIdx = 0;
     let currentSpeed = 0;
-    const cruiseSpeed = 38; // Normal realistic cruising speed (km/h)
+    const cruiseSpeed = 38;
 
-    if (navigationTimerRef.current) clearInterval(navigationTimerRef.current);
-
-    // Initial state: Speed starts at 0 km/h (no sudden speed surge)
     setNavigationProgress({
       currentStepIndex: 0,
       currentCoordIndex: 0,
@@ -402,7 +498,6 @@ export const NavigationProvider = ({ children }) => {
     });
 
     navigationTimerRef.current = setInterval(() => {
-      // If user paused navigation, hold position and speed 0
       if (isNavPausedRef.current) {
         setNavigationProgress(prev => ({ ...prev, speed: 0 }));
         return;
@@ -422,7 +517,6 @@ export const NavigationProvider = ({ children }) => {
       const currentPos = densePath[coordIdx];
       const prevPos = densePath[Math.max(0, coordIdx - 1)];
 
-      // Calculate bearing angle for smooth vehicle marker rotation
       const dLon = (currentPos[1] - prevPos[1]) * (Math.PI / 180);
       const lat1 = prevPos[0] * (Math.PI / 180);
       const lat2 = currentPos[0] * (Math.PI / 180);
@@ -430,14 +524,12 @@ export const NavigationProvider = ({ children }) => {
       const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLon);
       const bearing = (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
 
-      // Smooth acceleration: speed gently rises from 0 -> cruiseSpeed
       if (currentSpeed < cruiseSpeed) {
         currentSpeed = Math.min(cruiseSpeed, currentSpeed + 3);
       } else {
         currentSpeed = cruiseSpeed + Math.sin(coordIdx * 0.1) * 2;
       }
 
-      // Progress calculation
       const fraction = coordIdx / densePath.length;
       const totalKm = routeInfo.distanceValue || 88;
       const remainingKm = Math.max(0, (totalKm * (1 - fraction))).toFixed(1);
@@ -447,7 +539,6 @@ export const NavigationProvider = ({ children }) => {
       const mins = remainingMins % 60;
       const remainingTime = hours > 0 ? `${hours} hr ${mins} min` : `${mins} min`;
 
-      // Next step cue
       const targetStepIdx = Math.min(
         steps.length - 1,
         Math.floor(fraction * steps.length)
@@ -474,6 +565,10 @@ export const NavigationProvider = ({ children }) => {
 
   const stopNavigation = () => {
     if (navigationTimerRef.current) clearInterval(navigationTimerRef.current);
+    if (watchIdRef.current && navigator.geolocation) {
+      navigator.geolocation.clearWatch(watchIdRef.current);
+      watchIdRef.current = null;
+    }
     setIsNavigating(false);
     setIsNavPaused(false);
     if (window.speechSynthesis) window.speechSynthesis.cancel();
@@ -539,6 +634,8 @@ export const NavigationProvider = ({ children }) => {
         activeRouteIndex,
         selectAlternativeRoute,
         isNavigating,
+        navMode,
+        setNavMode,
         isNavPaused,
         togglePauseNavigation,
         navSpeedMultiplier,

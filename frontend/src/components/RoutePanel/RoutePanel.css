@@ -106,23 +106,58 @@
   color: #9aa0a6;
 }
 
-/* 2. Big Start Navigation Button */
-.btn-start-navigation {
+/* 2. Start Navigation Buttons (Dual: Live GPS & Demo Preview) */
+.nav-action-buttons-group {
+  display: flex;
+  gap: 8px;
   width: 100%;
+}
+
+.btn-start-navigation {
+  flex: 1.5;
   height: 48px;
   background: #1a73e8; /* Google Blue */
   color: #ffffff;
   border: none;
   border-radius: 14px;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
   cursor: pointer;
   box-shadow: 0 4px 14px rgba(26, 115, 232, 0.35);
   transition: all 0.2s ease;
+}
+
+.btn-start-simulation {
+  flex: 1;
+  height: 48px;
+  background: #f1f3f4;
+  color: #3c4043;
+  border: 1px solid #dadce0;
+  border-radius: 14px;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-start-simulation:hover {
+  background: #e8f0fe;
+  color: #1a73e8;
+  border-color: #1a73e8;
+}
+
+.btn-start-simulation.is-active-demo {
+  background: #e8f0fe;
+  color: #1a73e8;
+  border-color: #1a73e8;
 }
 
 .btn-start-navigation:hover {

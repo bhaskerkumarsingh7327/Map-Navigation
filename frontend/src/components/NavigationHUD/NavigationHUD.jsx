@@ -19,6 +19,8 @@ import "./NavigationHUD.css";
 export default function NavigationHUD() {
   const {
     isNavigating,
+    navMode,
+    startNavigation,
     isNavPaused,
     togglePauseNavigation,
     navSpeedMultiplier,
@@ -65,7 +67,12 @@ export default function NavigationHUD() {
           {renderManeuverIcon()}
         </div>
         <div className="hud-maneuver-text-box">
-          <span className="hud-distance-cue">In 350 m</span>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <span className="hud-distance-cue">In 350 m</span>
+            <span className="hud-mode-pill-sub">
+              {navMode === "live" ? "🛰️ Real GPS Drive (Physical Movement)" : "🎮 Virtual Demo"}
+            </span>
+          </div>
           <h2 className="hud-street-cue">{nextManeuver || "Continue on route"}</h2>
           <span className="hud-sub-cue">Towards {destination}</span>
         </div>
@@ -73,23 +80,35 @@ export default function NavigationHUD() {
 
       {/* 2. Floating Action Controls (Right side) */}
       <div className="hud-floating-side-tools">
-        {/* Pause / Play simulation toggle */}
+        {/* Toggle Mode button */}
         <button
-          className={`hud-side-btn ${isNavPaused ? "btn-is-paused" : ""}`}
-          onClick={togglePauseNavigation}
-          title={isNavPaused ? "Resume Navigation (Play)" : "Pause Navigation"}
+          className="hud-mode-toggle-btn"
+          onClick={() => startNavigation(navMode === "live" ? "demo" : "live")}
+          title={navMode === "live" ? "Switch to Demo Preview" : "Switch to Real GPS Driving"}
         >
-          {isNavPaused ? <FaPlay /> : <FaPause />}
+          {navMode === "live" ? "🎮 Demo Drive" : "🛰️ Real GPS"}
         </button>
 
-        {/* Speed multiplier toggle */}
-        <button
-          className="hud-speed-pill-btn"
-          onClick={cycleNavSpeed}
-          title="Click to toggle simulation speed (1x, 2x, 4x)"
-        >
-          ⚡ {navSpeedMultiplier}x
-        </button>
+        {/* Demo-only controls */}
+        {navMode === "demo" && (
+          <>
+            <button
+              className={`hud-side-btn ${isNavPaused ? "btn-is-paused" : ""}`}
+              onClick={togglePauseNavigation}
+              title={isNavPaused ? "Resume Navigation (Play)" : "Pause Navigation"}
+            >
+              {isNavPaused ? <FaPlay /> : <FaPause />}
+            </button>
+
+            <button
+              className="hud-speed-pill-btn"
+              onClick={cycleNavSpeed}
+              title="Click to toggle simulation speed (1x, 2x, 4x)"
+            >
+              ⚡ {navSpeedMultiplier}x
+            </button>
+          </>
+        )}
 
         {/* Mute toggle */}
         <button
