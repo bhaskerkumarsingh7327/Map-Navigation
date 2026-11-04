@@ -40,11 +40,11 @@ export default function Sidebar({ activeTab, setActiveTab }) {
       {/* Brand Header */}
       <div className="sidebar-brand-wrapper">
         <div className="brand-vector-icon">
-          <div className="inner-pulse-core"></div>
+          <img src="/favicon.svg" alt="Google Maps Logo" style={{ width: "22px", height: "30px", objectFit: "contain" }} />
         </div>
         <div className="brand-title-meta">
-          <h2>Maps Engine</h2>
-          <span>Google Navigation</span>
+          <h2>Google Navigation</h2>
+          <span>Maps & GPS Engine</span>
         </div>
       </div>
 

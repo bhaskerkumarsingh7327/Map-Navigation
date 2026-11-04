@@ -69,7 +69,7 @@ export default function Navbar() {
       {/* Brand & Status */}
       <div className="navbar-brand-section">
         <div className="navbar-logo-badge">
-          <FaMapMarkedAlt className="brand-logo-icon" />
+          <img src="/favicon.svg" alt="Google Maps Logo" style={{ width: "24px", height: "32px", objectFit: "contain" }} />
         </div>
         <div className="navbar-brand-text">
           <h2>Google Navigation</h2>
