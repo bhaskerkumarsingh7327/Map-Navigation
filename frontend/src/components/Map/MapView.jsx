@@ -1,5 +1,5 @@
 // src/components/Map/MapView.jsx
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useRef } from "react";
 import {
   MapContainer,
   TileLayer,
@@ -239,6 +239,32 @@ export default function MapView() {
   const [clickedLocation, setClickedLocation] = useState(null);
   const [showLayerPicker, setShowLayerPicker] = useState(false);
   const [mapInstance, setMapInstance] = useState(null);
+  const [showZoomHint, setShowZoomHint] = useState(false);
+  const hintTimeoutRef = useRef(null);
+
+  // Google Maps Gesture Handling: Disable accidental scroll zooming.
+  // Only zoom when user holds Cmd (Mac) or Ctrl (Windows) key while scrolling.
+  useEffect(() => {
+    if (!mapInstance) return;
+    const container = mapInstance.getContainer();
+
+    const handleWheel = (e) => {
+      if (e.ctrlKey || e.metaKey) {
+        mapInstance.scrollWheelZoom.enable();
+      } else {
+        mapInstance.scrollWheelZoom.disable();
+        setShowZoomHint(true);
+        if (hintTimeoutRef.current) clearTimeout(hintTimeoutRef.current);
+        hintTimeoutRef.current = setTimeout(() => setShowZoomHint(false), 1600);
+      }
+    };
+
+    container.addEventListener("wheel", handleWheel, { passive: true });
+    return () => {
+      container.removeEventListener("wheel", handleWheel);
+      if (hintTimeoutRef.current) clearTimeout(hintTimeoutRef.current);
+    };
+  }, [mapInstance]);
 
   const defaultCenter = sourceCoords || [25.6110, 85.1440];
 
@@ -309,10 +335,17 @@ export default function MapView() {
 
   return (
     <div className="google-map-root-wrapper">
+      {/* Google Maps gesture notice when scrolling without Cmd/Ctrl */}
+      {showZoomHint && (
+        <div className="google-maps-gesture-hint">
+          Use <strong>⌘ (Cmd) + scroll</strong> to zoom the map
+        </div>
+      )}
+
       <MapContainer
         center={defaultCenter}
         zoom={12}
-        scrollWheelZoom={true}
+        scrollWheelZoom={false}
         style={{ width: "100%", height: "100%" }}
         ref={setMapInstance}
         zoomControl={false}
